@@ -54,7 +54,7 @@ if exist "%~dp0python.exe" (
     echo To continue with kivy installation choose "y"
     echo To uninstall choose "n"
     set /p kivycontinue="Continue with kivy installation? y/n"
-    if %kivycontinue%==n (
+    if !kivycontinue!==n (
         goto uninstall
     )
 )
@@ -103,7 +103,7 @@ if %choice%==y (
 )
 
 :nokivy
-if %kivycontinue%==y (
+if !kivycontinue!==y (
     goto check
 )
 if %arch%==win32 (
@@ -128,7 +128,7 @@ goto check
 
 :uninstall
 set /p choice="Uninstall? y/n"
-start python -c "f=open(r'%~dp0%0.bat');s=''.join(f.readlines()).replace('set first=0','set first=1');f.close();f=open(r'%~dp0%0.bat','w');f.write(s);f.close();"
+del "%~dp0config.kivyinstaller"
 if %arch%==win32 (
     if not exist "%~dp0py%pyversion%.msi" (
         bitsadmin.exe /transfer "GetPythonMSI" "https://www.python.org/ftp/python/%pyversion%/python-%pyversion%.msi" "%~dp0py%pyversion%.msi"
@@ -146,6 +146,8 @@ if %arch%==win32 (
 )
 if not exist "%~dp0python.exe" (
     del /q "%~dp0config.kivyinstaller"
+    del /q "%~dp0update_kivy.bat"
+    del /q "%~dp0backup_kivy.bat"
     rmdir /s /q "%~dp0Lib"
     rmdir /s /q "%~dp0Scripts"
     rmdir /s /q "%~dp0share"
@@ -187,9 +189,9 @@ if %installerversion% lss %updateversion% (
     goto console
 )
 echo Backing up original file...
-xcopy "%~dp0kivy.bat" "%~dp0backup_kivy.bat"
+echo f | xcopy "%~dp0kivy.bat" "%~dp0backup_kivy.bat"
 echo Updating...
-start cmd /c timeout /t 5 & xcopy "%~dp0update_kivy.bat" "%~dp0kivy.bat" & del %~dp0update_kivy.bat && cmd /c "%~dp0%~n0"
+start cmd /c timeout /t 5 & (echo Y | xcopy "%~dp0update_kivy.bat" "%~dp0kivy.bat") & del %~dp0update_kivy.bat && cmd /c "%~dp0%~n0"
 exit
 
 :help
@@ -307,6 +309,7 @@ if [%1]==[update] (
     set onlycheck=1
     goto batupdate
 ) else if [%1]==[batupdate] (
+    set onlycheck=0
     goto batupdate
 ) else if [%1]==[help] (
     goto help
@@ -342,7 +345,7 @@ echo - Wheel: %wheel_version%
 echo - New wheel: %~n0 update or %~n0 updatemaster
 echo - Examples: share\kivy-examples
 echo - Launch: %~n0 main.py or python main.py
-echo - Uninstall %~n0 uninstall
+echo - Uninstall: %~n0 uninstall
 echo #####################################################################
 echo.
 cmd
