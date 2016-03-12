@@ -166,7 +166,9 @@ goto end
 
 :batupdate
 echo Checking for updates...
-bitsadmin.exe /transfer "GetKivyInstaller" "https://raw.githubusercontent.com/KeyWeeUsr/KivyInstaller/master/kivy.bat" "%~dp0update_kivy.bat"
+bitsadmin.exe /transfer "GetKivyInstaller" "https://raw.githubusercontent.com/KeyWeeUsr/KivyInstaller/master/kivy.bat" "%~dp0_update_kivy.bat"
+type "%~dp0_update_kivy.bat" | more /p > "%~dp0update_kivy.bat"
+del "%~dp0_update_kivy.bat"
 set /a line=0
 for /f "delims=" %%l in ('type "%~dp0update_kivy.bat"') do (
     set /a line=line+1
