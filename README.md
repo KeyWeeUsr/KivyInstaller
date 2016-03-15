@@ -23,6 +23,14 @@ Defaults: python versions `2.7.11` `3.4.4`, kivy-master `1.9.2`. Change them fre
     - To select y/n you have to type and press `enter`(`return`).
 - Enjoy!
 
+##### Install to existing python
+- Copy/clone `kivy.bat` to your folder with `python.exe` and run it.
+- Choose your installed python architecture version (32bit/64bit).
+- Select which python is installed (2.x/3.x).
+- Best to ignore registering extensions with `n` option, it won't work anyway because python is already installed.
+- Choose kivy version.
+- Enjoy!
+
 ##### Update
 Batch uses kivy wheels for installation, it means: for stable [pypi](https://pypi.python.org/pypi/Kivy/1.9.1) and for master [google drive](https://drive.google.com/folderview?id=0B1_HB9J8mZepOV81UHpDbmg5SWM&usp=sharing).
 
@@ -37,16 +45,23 @@ Batch uses kivy wheels for installation, it means: for stable [pypi](https://pyp
 
 For more details use `kivy help` after successful installation.
 
-##### Install to existing python
-- Copy/clone `kivy.bat` to your folder with `python.exe` and run it.
-- Choose your installed python architecture version (32bit/64bit).
-- Select which python is installed (2.x/3.x).
-- Best to ignore registering extensions with `n` option, it won't work anyway because python is already installed.
-- Choose kivy version.
-- Enjoy!
-
 ##### Uninstall
-There's an option to remove python with kivy and other packages + cached pip files. However, this option works only if the whole path to folder with python is the same as used during installation - ie it relies on `.msi` python installer partially. You can delete msi after installation. If batch needs the msi, it'll download it.
+There's an option to remove python with kivy and other packages + cached pip files. However, this option works only if the whole path to folder with python is the same as used during installation - i.e. it relies on `.msi` python installer partially. You can delete msi after installation. If batch needs the msi, it'll download it.
+
+##### Packages & Features
+###### Python packages
+- docutils
+- kivy-garden
+- pip
+- pygments
+- pypiwin32
+- requests
+- setuptools
+- wget
+- wheel
+
+###### Shortcuts
+Running `.py` file with `Send to` option works on WinXP+, however taskbar shortcut works only on WinXP for now. The taskbar item runs either as a console, or a file can be drag&dropped to it and it'll run the file directly. Useful for running snippets of code from your desktop. Shortcuts are created automatically after installation and removed together with all other data after `kivy uninstall`. Check `help` for more info.
 
 ### Attention KivyInstaller v1.0 users!
 - Version 1.0 didn't have an option for self-updating, therefore `update_v1.bat` is available for manual updating to latest version which has this kind of updating implemented. Copy `update_v1.bat` inside `kivy.bat` folder and run it.
@@ -55,6 +70,7 @@ There's an option to remove python with kivy and other packages + cached pip fil
 
 ### Problems
 If you experience problems, use `issues` in this repo.
+- `Kivy.bat` is not pinned to taskbar properly, Win ignores new item in folder(fix hopefully soon)
 - can't download python `.msi` - probably missing [bitsadmin](https://www.microsoft.com/en-us/download/details.aspx?id=18546), run cmd and `bitsadmin`. If available and still not downloading, report issue.
 - python installation doesn't work - `msi.log` from your folder is needed.
 - [msvcr100.dll](https://www.microsoft.com/en-us/download/details.aspx?id=5555) is missing

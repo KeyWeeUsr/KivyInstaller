@@ -1,11 +1,12 @@
 ::Author: KeyWeeUsr @ https://github.com/KeyWeeUsr
-::Version: 1.1
+::Version: 1.2
 ::Inspired by kivy.bat file for kivy1.8.0
 ::To reset file just delete "config.kivyinstaller"
 ::Bitsadmin is available since winXP SP2
 ::If it is not available, download and install to C:\Windows
 ::https://www.microsoft.com/en-us/download/details.aspx?id=18546
 @echo off
+set xp=0
 set cp=0
 set first=1
 set cpwhl=0
@@ -19,9 +20,16 @@ set pyversion=0
 set gstreamer=0
 set master=1.9.2
 set installkivy=1
-set installerversion=1.1
+set installerversion=1.2
 setlocal ENABLEDELAYEDEXPANSION
+ver | find "5.1" >nul && set xp=1
+set sendto=%appdata%\Microsoft\Windows\SendTo
+set taskbar=%appdata%\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar
 set addlocal=ADDLOCAL^=DefaultFeature,PrivateCRT,TclTk,Documentation,Tools,Testsuite
+if %xp%==1 (
+    set sendto=%userprofile%\SendTo
+    set taskbar=%appdata%\Microsoft\Internet Explorer\Quick Launch
+)
 
 echo #####################################################################
 echo KivyInstaller v%installerversion%
@@ -101,6 +109,10 @@ set /p choice="Install gstreamer? y/n"
 if %choice%==y (
     set gstreamer=1
 )
+set /p choice="Make shortcuts? y/n"
+if %choice%==y (
+    set shortcuts=1
+)
 
 :nokivy
 if !kivycontinue!==y (
@@ -128,7 +140,6 @@ goto check
 
 :uninstall
 set /p choice="Uninstall? y/n"
-del "%~dp0config.kivyinstaller"
 if %arch%==win32 (
     if not exist "%~dp0py%pyversion%.msi" (
         bitsadmin.exe /transfer "GetPythonMSI" "https://www.python.org/ftp/python/%pyversion%/python-%pyversion%.msi" "%~dp0py%pyversion%.msi"
@@ -148,11 +159,12 @@ if not exist "%~dp0python.exe" (
     del /q "%~dp0config.kivyinstaller"
     del /q "%~dp0update_kivy.bat"
     del /q "%~dp0backup_kivy.bat"
+    rmdir /s /q "%userprofile%\.kivy"
+    rmdir /s /q "%userprofile%\.idlerc"
     rmdir /s /q "%~dp0Lib"
     rmdir /s /q "%~dp0Scripts"
     rmdir /s /q "%~dp0share"
     rmdir /s /q "%~dp0whls"
-    
 )
 set /p choice="Remove cached pip files? y/n"
 if %choice%==y (
@@ -162,7 +174,7 @@ if %choice%==y (
         rmdir /s /q "%userprofile%\Local Settings\Application Data\pip"
     )
 )
-goto end
+goto rmshortcuts
 
 :batupdate
 echo Checking for updates...
@@ -209,12 +221,14 @@ echo   update             Update kivy wheel to the latest stable.
 echo   updatemaster       Update kivy wheel to the latest nightly-build.
 echo   batcheck           Check for new KivyInstaller version only.
 echo   batupdate          Check for new KivyInstaller version and update.
-echo   uninstall          Uninstall kivy, python and leave only %~n0.
+echo   uninstall          Uninstall kivy, python and leave only %~n0.bat.
+echo   mkshortcuts        Creates shortcuts for SendTo and TaskBar
+echo   rmshortcuts        Removes shortcuts for SendTo and TaskBar
 echo   help               Show this.
 echo.
 echo Optional:
 echo   idle               Python(.py) file editor with syntax highlighting
-exit
+goto end
 
 :check
 if exist "%~dp0python.exe" (
@@ -296,6 +310,21 @@ if not %errorlevel%==1 (
 ) else (
     echo Kivy was not installed properly!
 )
+
+:mkshortcuts
+if %shortcuts%==1 (
+    (echo @echo off) > "%taskbar%\Kivy.bat"
+    (echo if "%%~1"=="" ^() >> "%taskbar%\Kivy.bat"
+    (echo     start "" call "%~dp0%~n0.bat") >> "%taskbar%\Kivy.bat"
+    (echo ^) else ^() >> "%taskbar%\Kivy.bat"
+    (echo     start "" call "%~dp0%~n0.bat" "%%~1") >> "%taskbar%\Kivy.bat"
+    (echo ^)) >> "%taskbar%\Kivy.bat" && type "%taskbar%\Kivy.bat" > "%sendto%\Kivy.bat"
+)
+goto end
+
+:rmshortcuts
+del /q "%sendto%\Kivy.bat"
+del /q "%taskbar%\Kivy.bat"
 goto end
 
 :installed
@@ -313,13 +342,18 @@ if [%1]==[update] (
 ) else if [%1]==[batupdate] (
     set onlycheck=0
     goto batupdate
+) else if [%1]==[mkshortcuts] (
+    set shortcuts=1
+    goto mkshortcuts
+) else if [%1]==[rmshortcuts] (
+    goto rmshortcuts
 ) else if [%1]==[help] (
     goto help
 )
+cls
 set PATH=%~dp0;%~dp0Tools;%~dp0Lib\idlelib;%PATH%
 echo PATH:
 echo %PATH%
-echo ---------------------------------------------------------------------
 if [%1]==[] goto console
 echo.
 echo Running "python.exe %*"
