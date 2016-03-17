@@ -1,5 +1,5 @@
 ::Author: KeyWeeUsr @ https://github.com/KeyWeeUsr
-::Version: 1.2
+::Version: 1.2.1
 ::Inspired by kivy.bat file for kivy1.8.0
 ::To reset file just delete "config.kivyinstaller"
 ::Bitsadmin is available since winXP SP2
@@ -20,15 +20,14 @@ set pyversion=0
 set gstreamer=0
 set master=1.9.2
 set installkivy=1
-set installerversion=1.2
+set installerversion=1.2.1
 setlocal ENABLEDELAYEDEXPANSION
 ver | find "5.1" >nul && set xp=1
 set sendto=%appdata%\Microsoft\Windows\SendTo
-set taskbar=%appdata%\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar
+set taskbar=%appdata%\Microsoft\Internet Explorer\Quick Launch
 set addlocal=ADDLOCAL^=DefaultFeature,PrivateCRT,TclTk,Documentation,Tools,Testsuite
 if %xp%==1 (
     set sendto=%userprofile%\SendTo
-    set taskbar=%appdata%\Microsoft\Internet Explorer\Quick Launch
 )
 
 echo #####################################################################
@@ -213,17 +212,17 @@ echo.
 echo KivyInstaller v%installerversion%
 echo.
 echo Usage:
-echo   %~n0 ^<file^> [update] [updatemaster] [batcheck] [batupdate]
-echo          [uninstall] [help]
+echo   %~n0 [options]
 echo.
 echo   ^<file^>             Run python(.py) file.
 echo   update             Update kivy wheel to the latest stable.
 echo   updatemaster       Update kivy wheel to the latest nightly-build.
 echo   batcheck           Check for new KivyInstaller version only.
 echo   batupdate          Check for new KivyInstaller version and update.
+echo   remove             Uninstall kivy only.
 echo   uninstall          Uninstall kivy, python and leave only %~n0.bat.
-echo   mkshortcuts        Creates shortcuts for SendTo and TaskBar
-echo   rmshortcuts        Removes shortcuts for SendTo and TaskBar
+echo   mkshortcuts        Create shortcuts for SendTo and TaskBar.
+echo   rmshortcuts        Remove shortcuts for SendTo and TaskBar.
 echo   help               Show this.
 echo.
 echo Optional:
@@ -334,6 +333,8 @@ if [%1]==[update] (
 ) else if [%1]==[updatemaster] (
     set stable=0
     goto check
+) else if [%1]==[remove] (
+    python -m pip uninstall -y kivy
 ) else if [%1]==[uninstall] (
     goto uninstall
 ) else if [%1]==[batcheck] (
