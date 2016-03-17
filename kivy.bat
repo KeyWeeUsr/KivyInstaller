@@ -202,9 +202,9 @@ if %installerversion% lss %updateversion% (
     goto console
 )
 echo Backing up original file...
-echo f | xcopy "%~dp0kivy.bat" "%~dp0backup_kivy.bat"
+echo f | xcopy "%~dp0%~n0.bat" "%~dp0backup_kivy.bat"
 echo Updating...
-start cmd /c timeout /t 5 & (echo Y | xcopy "%~dp0update_kivy.bat" "%~dp0kivy.bat") & del %~dp0update_kivy.bat && cmd /c "%~dp0%~n0"
+start cmd /c timeout /t 5 & (echo Y | xcopy "%~dp0update_kivy.bat" "%~dp0%~n0.bat") & del %~dp0update_kivy.bat && cmd /c "%~dp0%~n0"
 exit
 
 :help
