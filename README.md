@@ -18,6 +18,7 @@ You can change `Product code` with some free tools and install python manually w
 Defaults: python versions `2.7.11` `3.4.4`, kivy-master `1.9.2`. Change them freely inside batch file if you need.
 ### How to use
 ##### Installation
+~3min of automated process, depends on your internet connection ([video](https://youtu.be/ch_ILDBEaok))
 - Create a folder for your python and place `kivy.bat` inside.
     - Alternatively, clone whole KivyInstaller repo with `git clone https://github.com/KeyWeeUsr/KivyInstaller`, python will be installed there.
 - Run `kivy.bat`, select your python and kivy versions, wait.
