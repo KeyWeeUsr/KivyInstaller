@@ -4,6 +4,7 @@ Everyone can mess things up even with simple installation or update. In version 
 - Install python2/python3 with kivy stable or master.
 - Update kivy stable, master or change version (stable<-->master).
 - Update itself (in case of new features, bug fixes).
+- Create Kivy applications package for Windows
 - Uninstall kivy and python.
 - All needed versions for debugging at one place.
 
@@ -30,7 +31,7 @@ Defaults: python versions `2.7.11` `3.4.4`, kivy-master `1.9.2`. Change them fre
 - Best to ignore registering extensions with `n` option, it won't work anyway because python is already installed.
 - Choose kivy version.
 - Enjoy!
-+ If you plan to use all features of KivyInstaller(`uninstall` mainly), you need to change python version(`py2`/`py3`) to the same version you use in `config` file. Otherwise it may cripple your python with `uninstall` option.
++ If you plan to use all features of KivyInstaller(`uninstall` mainly), you need to change python version(`py2`/`py3`) in `config` file to the same version you use. Otherwise it may cripple your python with `uninstall` option.
 
 ##### Update
 Batch uses kivy wheels for installation, it means: for stable [pypi](https://pypi.python.org/pypi/Kivy/1.9.1) and for master [google drive](https://drive.google.com/folderview?id=0B1_HB9J8mZepOV81UHpDbmg5SWM&usp=sharing).
@@ -46,6 +47,12 @@ Batch uses kivy wheels for installation, it means: for stable [pypi](https://pyp
 
 For more details use `kivy help` after successful installation.
 
+##### Pack
+Since version `1.3` KivyInstaller provides a quick way to create a package for Windows with `--debug` option on.
+- `kivy pack "<path>"`
+
+This way doesn't support other options such as `--name` or `--icon` and is only for debugging. Name of `.exe` is taken from parent folder of `.py`. For more options use `pyinstaller` directly.
+
 ##### Uninstall
 There's an option to remove python with kivy and other packages + cached pip files. However, this option works only if the whole path to folder with python is the same as used during installation - i.e. it relies on `.msi` python installer partially. You can delete msi after installation. If batch needs the msi, it'll download it.
 
@@ -57,6 +64,7 @@ Another option is using `kivy remove` command to remove kivy installation only. 
 - kivy-garden
 - pip
 - pygments
+- pyinstaller
 - pypiwin32
 - requests
 - setuptools
