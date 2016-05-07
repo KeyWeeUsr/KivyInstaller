@@ -384,7 +384,7 @@ if [%1]==[update] (
     goto help
 )
 cls
-set PATH=%~dp0;%~dp0Tools;%~dp0Scripts;%~dp0Lib\idlelib;%PATH%
+set PATH=%~dp0;%~dp0Tools;%~dp0Scripts;%~dp0share\sdl2\bin;%~dp0Lib\idlelib;%PATH%
 echo PATH:
 echo %PATH%
 if [%1]==[] goto console
