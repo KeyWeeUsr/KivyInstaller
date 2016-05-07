@@ -300,6 +300,7 @@ del "%~dp0whls\Kivy-%master%.dev0-%cpwhl%-none-%arch%.whl"
 
 :kivyend
 del "%~dp0msi.log"
+set PATH=%~dp0;%~dp0Tools;%~dp0Scripts;%~dp0share\sdl2\bin;%~dp0Lib\idlelib;%PATH%
 echo Close touchtracer demo with Escape key, do not use X!
 pause
 echo Running touchtracer demo...
