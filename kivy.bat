@@ -1,5 +1,5 @@
 ::Author: KeyWeeUsr @ https://github.com/KeyWeeUsr
-::Version: 1.3
+::Version: 1.4
 ::Inspired by kivy.bat file for kivy1.8.0
 ::To reset file just delete "config.kivyinstaller"
 ::Bitsadmin is available since winXP SP2
@@ -20,7 +20,8 @@ set pyversion=0
 set gstreamer=0
 set master=1.9.2
 set installkivy=1
-set installerversion=1.3
+set installerversion=1.4
+set admin=1
 setlocal ENABLEDELAYEDEXPANSION
 ver | find "5.1" >nul && set xp=1
 title = KivyInstaller %installerversion%
@@ -65,6 +66,16 @@ if exist "%~dp0python.exe" (
     if !kivycontinue!==n (
         goto uninstall
     )
+)
+
+:privileges
+set /p choice="Admin privileges? y/n"
+if %choice%==y (
+    goto version
+) else if %choice%==n (
+    set admin=0
+) else (
+    goto privileges
 )
 
 :version
@@ -128,7 +139,12 @@ if %arch%==win32 (
         bitsadmin.exe /transfer "GetPythonMSI" "https://www.python.org/ftp/python/%pyversion%/python-%pyversion%.msi" "%~dp0py%pyversion%.msi"
         echo Installing...
     )
-    msiexec.exe /i "%~dp0py%pyversion%.msi" /qb /L*V "%~dp0msi.log" ALLUSERS=0 TARGETDIR="%~dp0" CURRENTDIRECTORY="%~dp0" %addlocal%
+    if %admin%==0 (
+        msiexec.exe /a "%~dp0py%pyversion%.msi" /qb /L*V "%~dp0msi.log" ALLUSERS=0 TARGETDIR="%~dp0kivy" CURRENTDIRECTORY="%~dp0" %addlocal%
+        for /f "tokens=*" %%f in ('dir /b "%~dp0kivy"') do move "%~dp0kivy\%%f" "%~dp0%%f"
+    ) else (
+        msiexec.exe /i "%~dp0py%pyversion%.msi" /qb /L*V "%~dp0msi.log" ALLUSERS=0 TARGETDIR="%~dp0" CURRENTDIRECTORY="%~dp0" %addlocal%
+    )
 ) else (
     if exist "%~dp0py%pyversion%.amd64.msi" (
         echo Installer is already downloaded!
@@ -136,7 +152,12 @@ if %arch%==win32 (
         bitsadmin.exe /transfer "GetPythonMSI" "https://www.python.org/ftp/python/%pyversion%/python-%pyversion%.amd64.msi" "%~dp0py%pyversion%.amd64.msi"
         echo Installing...
     )
-    msiexec.exe /i "%~dp0py%pyversion%.amd64.msi" /qb /L*V "%~dp0msi.log" ALLUSERS=0 TARGETDIR="%~dp0" CURRENTDIRECTORY="%~dp0" %addlocal%
+    if %admin%==0 (
+        msiexec.exe /a "%~dp0py%pyversion%.amd64.msi" /qb /L*V "%~dp0msi.log" ALLUSERS=0 TARGETDIR="%~dp0kivy" CURRENTDIRECTORY="%~dp0" %addlocal%
+        for /f "tokens=*" %%f in ('dir /b "%~dp0kivy"') do move "%~dp0kivy\%%f" "%~dp0%%f"
+    ) else (
+        msiexec.exe /i "%~dp0py%pyversion%.amd64.msi" /qb /L*V "%~dp0msi.log" ALLUSERS=0 TARGETDIR="%~dp0" CURRENTDIRECTORY="%~dp0" %addlocal%
+    )
 )
 goto check
 
@@ -149,18 +170,31 @@ if %arch%==win32 (
         bitsadmin.exe /transfer "GetPythonMSI" "https://www.python.org/ftp/python/%pyversion%/python-%pyversion%.msi" "%~dp0py%pyversion%.msi"
     )
     if %choice%==y (
-        msiexec.exe /x "%~dp0py%pyversion%.msi" /qb
+        if %admin%==0 (
+            attrib +r +a *.bat
+            for /f "delims=" %%i in ('dir /b') do (rmdir "%%i" /s/q || del "%%i" /s/q)
+            attrib -r -a *.bat
+        ) else (
+            msiexec.exe /x "%~dp0py%pyversion%.msi" /qb
+        )
     ) else (goto end)
 ) else (
     if not exist "%~dp0py%pyversion%.amd64.msi" (
         bitsadmin.exe /transfer "GetPythonMSI" "https://www.python.org/ftp/python/%pyversion%/python-%pyversion%.amd64.msi" "%~dp0py%pyversion%.amd64.msi"
     )
     if %choice%==y (
-        msiexec.exe /x "%~dp0py%pyversion%.amd64.msi" /qb
+        if %admin%==0 (
+            attrib +r +a *.bat
+            for /f "delims=" %%i in ('dir /b') do (rmdir "%%i" /s/q || del "%%i" /s/q)
+            attrib -r -a *.bat
+        ) else (
+            msiexec.exe /x "%~dp0py%pyversion%.amd64.msi" /qb
+        )
     ) else (goto end)
 )
 if not exist "%~dp0python.exe" (
     del /q "%~dp0config.kivyinstaller"
+    del /q "%~dp0extrapath.kivyinstaller"
     del /q "%~dp0update_kivy.bat"
     del /q "%~dp0backup_kivy.bat"
     del /s /q /f "%~dp0*.spec"
@@ -238,6 +272,9 @@ echo.
 echo Optional:
 echo   idle                    Python(.py) text editor with syntax highlighting
 echo   pyinstaller             Executable packager for Python programs
+echo.
+echo ExtraPATH:
+echo   Write new PATH as it is. Separate with ; . No quotes, no ; at the end.
 goto end
 
 :check
@@ -296,17 +333,17 @@ if %first%==0 (
 ) else (
     python -m pip install "%~dp0whls\Kivy-%master%.dev0-%cpwhl%-none-%arch%.whl"
 )
-del "%~dp0whls\Kivy-%master%.dev0-%cpwhl%-none-%arch%.whl"
+del /q "%~dp0whls\Kivy-%master%.dev0-%cpwhl%-none-%arch%.whl"
 
 :kivyend
-del "%~dp0msi.log"
+del /q "%~dp0msi.log"
 set PATH=%~dp0;%~dp0Tools;%~dp0Scripts;%~dp0share\sdl2\bin;%~dp0Lib\idlelib;%PATH%
 echo Close touchtracer demo with Escape key, do not use X!
 pause
 echo Running touchtracer demo...
->"%~dp0temp.txt" python -c "exec(\"try:\n    import kivy;\nexcept ImportError:\n    print('unsuccessful');\")"
-find /c "unsuccessful" "%~dp0temp.txt"
-del "%~dp0temp.txt"
+>"%~dp0error.txt" python -c "exec(\"try:\n    import kivy;\nexcept ImportError:\n    print('unsuccessful');\")"
+find /c "unsuccessful" "%~dp0error.txt"
+del /q "%~dp0error.txt"
 if not %errorlevel%==1 (
     start python "%~dp0share\kivy-examples\demo\touchtracer\main.py"
     (echo cp=%cp%) > "%~dp0config.kivyinstaller"
@@ -322,16 +359,20 @@ if not %errorlevel%==1 (
     (echo master=%master%) >> "%~dp0config.kivyinstaller"
     (echo installkivy=%installkivy%) >> "%~dp0config.kivyinstaller"
     (echo shrtct=%shrtct%) >> "%~dp0config.kivyinstaller"
+    (echo admin=%admin%) >> "%~dp0config.kivyinstaller"
+    nul > "%~dp0extrapath.kivyinstaller"
 ) else (
     echo Kivy was not installed properly!
 )
 
 :mkshortcuts
-if %shortcuts%==1 (
+if !shortcuts!==1 (
     (echo @echo off) > "%taskbar%\Kivy%shrtct%.bat"
     (echo if "%%~1"=="" ^() >> "%taskbar%\Kivy%shrtct%.bat"
+    (echo     cd "%~dp0") >> "%taskbar%\Kivy%shrtct%.bat"
     (echo     start "" call "%~dp0%~n0.bat") >> "%taskbar%\Kivy%shrtct%.bat"
     (echo ^) else ^() >> "%taskbar%\Kivy%shrtct%.bat"
+    (echo     cd "%~dp0") >> "%taskbar%\Kivy%shrtct%.bat"
     (echo     start "" call "%~dp0%~n0.bat" "%%~1") >> "%taskbar%\Kivy%shrtct%.bat"
     (echo ^)) >> "%taskbar%\Kivy%shrtct%.bat" && type "%taskbar%\Kivy%shrtct%.bat" > "%sendto%\Kivy%shrtct%.bat"
 )
@@ -384,15 +425,19 @@ if [%1]==[update] (
 ) else if [%1]==[help] (
     goto help
 )
-cls
-set PATH=%~dp0;%~dp0Tools;%~dp0Scripts;%~dp0share\sdl2\bin;%~dp0Lib\idlelib;%PATH%
+set /p extrapath=<"%~dp0extrapath.kivyinstaller"
+if defined extrapath (
+    set PATH=%extrapath%;%~dp0;%~dp0Tools;%~dp0Scripts;%~dp0share\sdl2\bin;%~dp0Lib\idlelib;!PATH!
+) else (
+    set PATH=%~dp0;%~dp0Tools;%~dp0Scripts;%~dp0share\sdl2\bin;%~dp0Lib\idlelib;!PATH!
+)
 echo PATH:
 echo %PATH%
 if [%1]==[] goto console
 echo.
 echo Running "python.exe %*"
 python %*
-if not %errorlevel%==0 (pause)
+if not %errorlevel%==0 (goto end)
 
 :end
 pause
