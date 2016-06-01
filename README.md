@@ -1,5 +1,22 @@
-# KivyInstaller
-### Summary
+KivyInstaller
+=============
+#### Table of contents
+- [Summary](#summary)
+- [How to use](#how-to-use)
+  - [Installation](#installation)
+  - [Install to existing Python](#install-to-existing-python)
+  - [Update](#update)
+  - [Pack](#pack)
+  - [Extra PATH](#extra-path)
+  - [Uninstall](#uninstall)
+- [Packages & Features](#packages--features)
+  - [Python packages](#python-packages)
+  - [Shortcuts](#shortcuts)
+- [Warning for v1.0](#attention-kivyinstaller-v10-users)
+- [Problems](#problems)
+
+Summary
+-------
 Everyone can mess things up even with simple installation or update. In version
 `1.8.0` there was a batch file for making things easier for beginners or
 regular users, but this file disappeared as the wheel came in. KivyInstaller is
@@ -38,7 +55,8 @@ everything except `kivy.bat` and `.msi`, then reinstall.
 **Defaults:** Python versions `2.7.11`, `3.4.4`, kivy-master `1.9.2`. Change
 them freely inside batch file if you need.
 
-### How to use
+How to use
+----------
 ##### Installation
 ~3min of automated process, depends on your internet connection
 ([video](https://youtu.be/ch_ILDBEaok))
@@ -101,8 +119,8 @@ For more paths, separate them with semicolon as in casual PATH setting:
 
     C:\Users\John;C:\Users\Guest
 
-**Don't** end the line with semicolon or write multiple lines. It works as a
-*single* line.
+**Do not** end the line with a semicolon or write multiple lines. It works as a
+*single* line file.
 
 ##### Uninstall
 There's an option to remove Python with Kivy and other packages + cached pip
@@ -114,8 +132,9 @@ msi, it'll download it.
 Another option is using `kivy remove` command to remove Kivy installation only.
 The conditions are the same as for previous option.
 
-##### Packages & Features
-###### Python packages
+Packages & Features
+-------------------
+##### Python packages
 - docutils
 - Kivy-Garden
 - pip
@@ -127,7 +146,7 @@ The conditions are the same as for previous option.
 - wget
 - wheel
 
-###### Shortcuts
+##### Shortcuts
 Running `.py` file with `Send to` option works on WinXP+, however taskbar
 shortcut works only on WinXP and WinVista. The taskbar item runs either as a
 console, or a file can be drag&dropped to it and it'll run the file directly.
@@ -138,10 +157,12 @@ automatically after installation and removed together with all other data after
 Win7+ taskbar has a different functionality than original `Quick Launch`,
 therefore a bad workaround is to drag&drop a manually created shortcut for
 `kivy.bat` to the taskbar, however script drag&dropping doesn't seem to work
-anyway. The better one is [re-enabling](http://www.howtogeek.com/howto/windows-7/add-the-quick-launch-bar-to-the-taskbar-in-windows-7/)
+anyway. The better one is [re-enabling](
+http://www.howtogeek.com/howto/windows-7/add-the-quick-launch-bar-to-the-taskbar-in-windows-7/)
 `Quick Launch` in your system, then the script drag&drop works.
 
-### Attention KivyInstaller v1.0 users!
+Attention KivyInstaller v1.0 users!
+-----------------------------------
 - Version 1.0 didn't have an option for self-updating, therefore
   `update_v1.bat` is available for manual updating to the latest version which
   has this kind of updating implemented. Copy `update_v1.bat` inside `kivy.bat`
@@ -151,9 +172,11 @@ anyway. The better one is [re-enabling](http://www.howtogeek.com/howto/windows-7
 - For anyone who would clone whole repo - updater will not run if your version
   isn't `==1.0`. If it annoys you, remove it.
 
-### Problems
+Problems
+--------
 If you experience problems, use `issues` in this repo.
-- can't download Python `.msi` - probably missing [bitsadmin](https://www.microsoft.com/en-us/download/details.aspx?id=18546), run cmd and
+- can't download Python `.msi` - probably missing [bitsadmin](
+https://www.microsoft.com/en-us/download/details.aspx?id=18546), run `cmd` and
   `bitsadmin`. If available and still not downloading, report issue.
 - Python installation doesn't work - `msi.log` from your folder is needed.
 - `w9xpopen.exe` error - Python `.msi` installer is broken. Delete it,
