@@ -1,11 +1,11 @@
 ::Author: KeyWeeUsr @ https://github.com/KeyWeeUsr
-::Version: 1.4
+::Version: 1.5
 ::Inspired by kivy.bat file for kivy1.8.0
 ::To reset file just delete "config.kivyinstaller"
 ::Bitsadmin is available since winXP SP2
 ::If it is not available, download and install to C:\Windows
 ::https://www.microsoft.com/en-us/download/details.aspx?id=18546
-@echo off
+@if not defined DEBUG (echo off)
 set xp=0
 set cp=0
 set first=1
@@ -20,7 +20,7 @@ set pyversion=0
 set gstreamer=0
 set master=1.9.2
 set installkivy=1
-set installerversion=1.4
+set installerversion=1.5
 set admin=1
 setlocal ENABLEDELAYEDEXPANSION
 ver | find "5.1" >nul && set xp=1
@@ -140,8 +140,9 @@ if %arch%==win32 (
         echo Installing...
     )
     if %admin%==0 (
+        copy "%~dp0py%pyversion%.msi" "%~dp0py%pyversion%_.msi" >nul
         msiexec.exe /a "%~dp0py%pyversion%.msi" /qb /L*V "%~dp0msi.log" ALLUSERS=0 TARGETDIR="%~dp0kivy" CURRENTDIRECTORY="%~dp0" %addlocal%
-        for /f "tokens=*" %%f in ('dir /b "%~dp0kivy"') do move "%~dp0kivy\%%f" "%~dp0%%f"
+        for /f "tokens=*" %%f in ('dir /b "%~dp0kivy"') do move "%~dp0kivy\%%f" "%~dp0%%f" >nul
     ) else (
         msiexec.exe /i "%~dp0py%pyversion%.msi" /qb /L*V "%~dp0msi.log" ALLUSERS=0 TARGETDIR="%~dp0" CURRENTDIRECTORY="%~dp0" %addlocal%
     )
@@ -153,12 +154,18 @@ if %arch%==win32 (
         echo Installing...
     )
     if %admin%==0 (
+        copy "%~dp0py%pyversion%.msi" "%~dp0py%pyversion%_.msi" >nul
         msiexec.exe /a "%~dp0py%pyversion%.amd64.msi" /qb /L*V "%~dp0msi.log" ALLUSERS=0 TARGETDIR="%~dp0kivy" CURRENTDIRECTORY="%~dp0" %addlocal%
-        for /f "tokens=*" %%f in ('dir /b "%~dp0kivy"') do move "%~dp0kivy\%%f" "%~dp0%%f"
+        for /f "tokens=*" %%f in ('dir /b "%~dp0kivy"') do move "%~dp0kivy\%%f" "%~dp0%%f" >nul
     ) else (
         msiexec.exe /i "%~dp0py%pyversion%.amd64.msi" /qb /L*V "%~dp0msi.log" ALLUSERS=0 TARGETDIR="%~dp0" CURRENTDIRECTORY="%~dp0" %addlocal%
     )
 )
+if %admin%==0 (
+    del /q "%~dp0py%pyversion%.msi"
+    move /y "%~dp0py%pyversion%_.msi" "%~dp0py%pyversion%.msi" >nul
+)
+
 goto check
 
 :uninstall
@@ -338,8 +345,6 @@ del /q "%~dp0whls\Kivy-%master%.dev0-%cpwhl%-none-%arch%.whl"
 :kivyend
 del /q "%~dp0msi.log"
 set PATH=%~dp0;%~dp0Tools;%~dp0Scripts;%~dp0share\sdl2\bin;%~dp0Lib\idlelib;%PATH%
-echo Close touchtracer demo with Escape key, do not use X!
-pause
 echo Running touchtracer demo...
 >"%~dp0error.txt" python -c "exec(\"try:\n    import kivy;\nexcept ImportError:\n    print('unsuccessful');\")"
 find /c "unsuccessful" "%~dp0error.txt"
@@ -360,7 +365,7 @@ if not %errorlevel%==1 (
     (echo installkivy=%installkivy%) >> "%~dp0config.kivyinstaller"
     (echo shrtct=%shrtct%) >> "%~dp0config.kivyinstaller"
     (echo admin=%admin%) >> "%~dp0config.kivyinstaller"
-    nul > "%~dp0extrapath.kivyinstaller"
+    type nul > "%~dp0extrapath.kivyinstaller"
 ) else (
     echo Kivy was not installed properly!
 )
@@ -446,7 +451,7 @@ exit
 :console
 echo.
 echo ###############################################################################
-@echo OFF
+@if not defined DEBUG_CONSOLE (echo off)
 python -c "import sys; print('.'.join(str(x) for x in sys.version_info[:3]))" > temp.txt
 set /p python_version=<temp.txt
 del temp.txt
