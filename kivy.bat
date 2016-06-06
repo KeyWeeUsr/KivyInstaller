@@ -1,5 +1,5 @@
 ::Author: KeyWeeUsr @ https://github.com/KeyWeeUsr
-::Version: 1.5
+::Version: 1.6
 ::Inspired by kivy.bat file for kivy1.8.0
 ::To reset file just delete "config.kivyinstaller"
 ::Bitsadmin is available since winXP SP2
@@ -20,7 +20,7 @@ set pyversion=0
 set gstreamer=0
 set master=1.9.2
 set installkivy=1
-set installerversion=1.5
+set installerversion=1.6
 set admin=1
 setlocal ENABLEDELAYEDEXPANSION
 ver | find "5.1" >nul && set xp=1
@@ -165,7 +165,6 @@ if %admin%==0 (
     del /q "%~dp0py%pyversion%.msi"
     move /y "%~dp0py%pyversion%_.msi" "%~dp0py%pyversion%.msi" >nul
 )
-
 goto check
 
 :uninstall
@@ -335,8 +334,12 @@ echo.shutil.copy2(root+'\\whls\\'+whl,root+'\\whls\\'+new)>> "%~dp0getnightly.py
 python "%~dp0getnightly.py"
 del "%~dp0getnightly.py"
 if %first%==0 (
-    python -m pip uninstall -y kivy
-    python -m pip install "%~dp0whls\Kivy-%master%.dev0-%cpwhl%-none-%arch%.whl"
+    if exist "%~dp0whls\Kivy-%master%.dev0-%cpwhl%-none-%arch%.whl" (
+        python -m pip uninstall -y kivy
+        python -m pip install "%~dp0whls\Kivy-%master%.dev0-%cpwhl%-none-%arch%.whl"
+    ) else (
+        echo No nightly wheel is available yet!
+    )
 ) else (
     python -m pip install "%~dp0whls\Kivy-%master%.dev0-%cpwhl%-none-%arch%.whl"
 )
