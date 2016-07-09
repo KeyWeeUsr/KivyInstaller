@@ -1,6 +1,7 @@
 *
 !.gitignore
 !kivy.bat
+!logo.png
 !LICENSE.txt
 !README.md
 !update_v1.bat

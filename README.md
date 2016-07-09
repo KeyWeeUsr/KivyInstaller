@@ -1,5 +1,8 @@
 KivyInstaller
 =============
+
+<img align="right" height="256" src="https://raw.githubusercontent.com/KeyWeeUsr/KivyInstaller/master/logo.png"/>
+
 #### Table of contents
 - [Summary](#summary)
 - [How to use](#how-to-use)
