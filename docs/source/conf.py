@@ -16,7 +16,7 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
+import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
@@ -59,11 +59,12 @@ author = u'Peter Badida'
 # built documents.
 #
 # The short X.Y version.
+fpath = os.path.dirname(os.path.abspath(__file__))
 try:
-    with open("../../kivy.bat") as _f:
+    with open(fpath+"/../../kivy.bat") as _f:
         for i, line in enumerate(_f):
             if i == 1:
-                version = line[len('::Version: '):]
+                version = line[len('::Version: '):-1]
             elif i > 1:
                 break
 except:
@@ -156,8 +157,8 @@ html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 # html_logo = None
 
 # The name of an image file (relative to this directory) to use as a favicon of
-# the docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
-# pixels large.
+# the docs.  This file should be a Windows icon file (.ico) being 16x16 or
+# 32x32 pixels large.
 #
 # html_favicon = None
 
