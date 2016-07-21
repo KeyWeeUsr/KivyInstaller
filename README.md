@@ -3,7 +3,8 @@ KivyInstaller
 
 <img align="right" height="256" src="https://raw.githubusercontent.com/KeyWeeUsr/KivyInstaller/master/logo.png"/>
 
-<a href="http://kivyinstaller.readthedocs.io/en/latest/" target="_blank"><img src="https://img.shields.io/badge/docs-latest-brightgreen.svg" /></a>
+<a href="http://kivyinstaller.readthedocs.io/en/master/" target="_blank">
+<img src="https://img.shields.io/badge/docs-master-brightgreen.svg" /></a>
 
 _It ships Kivy right to you!_
 
