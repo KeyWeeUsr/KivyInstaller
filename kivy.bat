@@ -1,5 +1,5 @@
 ::Author: KeyWeeUsr @ https://github.com/KeyWeeUsr
-::Version: 1.6
+::Version: 1.7
 ::Inspired by kivy.bat file for kivy1.8.0
 ::To reset file just delete "config.kivyinstaller"
 ::Bitsadmin is available since winXP SP2
@@ -20,7 +20,7 @@ set pyversion=0
 set gstreamer=0
 set master=1.9.2
 set installkivy=1
-set installerversion=1.6
+set installerversion=1.7
 set admin=1
 setlocal ENABLEDELAYEDEXPANSION
 ver | find "5.1" >nul && set xp=1
@@ -312,7 +312,7 @@ echo.import os,glob,sys,re,requests,wget,datetime,shutil> "%~dp0getnightly.py"
 echo.n = requests.get('%driveurl%').content>> "%~dp0getnightly.py"
 >>"%~dp0getnightly.py" echo.y = '{:%%d%%m%%Y}'.format(datetime.datetime.now()-datetime.timedelta(days=1))
 echo.try:>> "%~dp0getnightly.py"
->>"%~dp0getnightly.py" echo.    m=re.findall('''\"(Kivy-\d\.\d\.\d)(\.\w{4}_'''+y+'''_git\_?\w{7}-%cpwhl%)(-none|_\d{8}_git_\w{7}-%cp%)(-%arch%.whl)",,,,,"(\S+)",,\"''',n.decode('utf-8'))[0]
+>>"%~dp0getnightly.py" echo.    m=re.findall('''\"(Kivy-\d\.\d\.\d)(\.\w{4}_'''+y+'''_git\_?\w{7}-%cpwhl%)(-none|_\d{8}_git_\w{7}-%cp%|-%cp%)(-%arch%.whl)",,,,,"(\S+)",,\"''',n.decode('utf-8'))[0]
 echo.except IndexError:>> "%~dp0getnightly.py"
 echo.    print("No nightly-build yet")>> "%~dp0getnightly.py"
 echo.file_name = ''.join(m[:len(m)-1])>> "%~dp0getnightly.py"
