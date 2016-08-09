@@ -1,5 +1,5 @@
 ::Author: KeyWeeUsr @ https://github.com/KeyWeeUsr
-::Version: 1.7
+::Version: 1.8
 ::Inspired by kivy.bat file for kivy1.8.0
 ::To reset file just delete "config.kivyinstaller"
 ::Bitsadmin is available since winXP SP2
@@ -20,7 +20,7 @@ set pyversion=0
 set gstreamer=0
 set master=1.9.2
 set installkivy=1
-set installerversion=1.7
+set installerversion=1.8
 set admin=1
 setlocal ENABLEDELAYEDEXPANSION
 ver | find "5.1" >nul && set xp=1
@@ -69,23 +69,23 @@ if exist "%~dp0python.exe" (
 )
 
 :privileges
-set /p choice="Admin privileges? y/n"
-if %choice%==y (
+set /p choice_privileges="Admin privileges? y/n"
+if %choice_privileges%==y (
     goto version
-) else if %choice%==n (
+) else if %choice_privileges%==n (
     set admin=0
 ) else (
     goto privileges
 )
 
 :version
-set /p choice="Python version? 2/3"
-if %choice%==2 (
+set /p choice_python="Python version? 2/3"
+if %choice_python%==2 (
     set pyversion=%py2%
     set cp=%cp2%m
     set cpwhl=%cp2%
     set shrtct=%cp2:~2%
-) else if %choice%==3 (
+) else if %choice_python%==3 (
     set pyversion=%py3%
     set cp=%cp3%m
     set cpwhl=%cp3%
@@ -95,35 +95,35 @@ if %choice%==2 (
 )
 
 :extensions
-set /p choice="Register python extensions (.py, .pyc, ...)? y/n"
-if %choice%==y (
+set /p choice_ext="Register python extensions (.py, .pyc, ...)? y/n"
+if %choice_ext%==y (
     set addlocal=%addlocal%,Extensions
-) else if %choice%==n (
+) else if %choice_ext%==n (
     set addlocal=%addlocal%
 ) else (
     goto extensions
 )
 
 :kivy
-set /p choice="Install Kivy? y/n"
-if %choice%==y (
+set /p choice_kivy="Install Kivy? y/n"
+if %choice_kivy%==y (
     set installkivy=1
-) else if %choice%==n (
+) else if %choice_kivy%==n (
     set installkivy=0
     goto nokivy
 ) else (
     goto kivy
 )
-set /p choice="Install kivy-master? y/n"
-if %choice%==y (
+set /p choice_master="Install kivy-master? y/n"
+if %choice_master%==y (
     set stable=0
 )
-set /p choice="Install gstreamer? y/n"
-if %choice%==y (
+set /p choice_gst="Install gstreamer? y/n"
+if %choice_gst%==y (
     set gstreamer=1
 )
-set /p choice="Make shortcuts? y/n"
-if %choice%==y (
+set /p choice_shrt="Make shortcuts? y/n"
+if %choice_shrt%==y (
     set shortcuts=1
 )
 
@@ -168,14 +168,14 @@ if %admin%==0 (
 goto check
 
 :uninstall
-set /p choice="Uninstall? y/n"
-set /p choice2="Remove cached pip files? y/n"
-set /p choice3="Remove dist folder? y/n"
+set /p choice_uninstall="Uninstall? y/n"
+set /p choice_pipcache="Remove cached pip files? y/n"
+set /p choice_dist="Remove dist folder? y/n"
 if %arch%==win32 (
     if not exist "%~dp0py%pyversion%.msi" (
         bitsadmin.exe /transfer "GetPythonMSI" "https://www.python.org/ftp/python/%pyversion%/python-%pyversion%.msi" "%~dp0py%pyversion%.msi"
     )
-    if %choice%==y (
+    if %choice_uninstall%==y (
         if %admin%==0 (
             attrib +r +a *.bat
             for /f "delims=" %%i in ('dir /b') do (rmdir "%%i" /s/q || del "%%i" /s/q)
@@ -188,7 +188,7 @@ if %arch%==win32 (
     if not exist "%~dp0py%pyversion%.amd64.msi" (
         bitsadmin.exe /transfer "GetPythonMSI" "https://www.python.org/ftp/python/%pyversion%/python-%pyversion%.amd64.msi" "%~dp0py%pyversion%.amd64.msi"
     )
-    if %choice%==y (
+    if %choice_uninstall%==y (
         if %admin%==0 (
             attrib +r +a *.bat
             for /f "delims=" %%i in ('dir /b') do (rmdir "%%i" /s/q || del "%%i" /s/q)
@@ -212,14 +212,14 @@ if not exist "%~dp0python.exe" (
     rmdir /s /q "%~dp0whls"
     rmdir /s /q "%~dp0build"
 )
-if %choice2%==y (
+if %choice_pipcache%==y (
     if exist "%localappdata%\pip" (
         rmdir /s /q "%localappdata%\pip"
     ) else (
         rmdir /s /q "%userprofile%\Local Settings\Application Data\pip"
     )
 )
-if %choice3%==y (
+if %choice_dist%==y (
     rmdir /s /q "%~dp0dist"
 )
 goto rmshortcuts
@@ -476,3 +476,4 @@ echo - Uninstall:     %~n0 uninstall
 echo ###############################################################################
 echo.
 cmd
+exit
