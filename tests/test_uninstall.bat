@@ -1,3 +1,4 @@
+set DEBUG=1
 set choice_pipcache=y
 set choice_dist=y
 

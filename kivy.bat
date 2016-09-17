@@ -1,5 +1,5 @@
 ::Author: KeyWeeUsr @ https://github.com/KeyWeeUsr
-::Version: 1.8
+::Version: 1.9
 ::Inspired by kivy.bat file for kivy1.8.0
 ::To reset file just delete "config.kivyinstaller"
 ::Bitsadmin is available since winXP SP2
@@ -20,7 +20,7 @@ set pyversion=0
 set gstreamer=0
 set master=1.9.2
 set installkivy=1
-set installerversion=1.8
+set installerversion=1.9
 set admin=1
 setlocal ENABLEDELAYEDEXPANSION
 ver | find "5.1" >nul && set xp=1
@@ -307,18 +307,17 @@ if %stable%==1 (
     goto kivyend
 )
 mkdir "%~dp0whls"
-set driveurl=https://drive.google.com/folderview?id=0B1_HB9J8mZepOV81UHpDbmg5SWM^^^&usp=sharing#list
 echo.import os,glob,sys,re,requests,wget,datetime,shutil> "%~dp0getnightly.py"
-echo.n = requests.get('%driveurl%').content>> "%~dp0getnightly.py"
->>"%~dp0getnightly.py" echo.y = '{:%%d%%m%%Y}'.format(datetime.datetime.now()-datetime.timedelta(days=1))
-echo.try:>> "%~dp0getnightly.py"
->>"%~dp0getnightly.py" echo.    m=re.findall('''\"(Kivy-\d\.\d\.\d)(\.\w{4}_'''+y+'''_git\_?\w{7}-%cpwhl%)(-none|_\d{8}_git_\w{7}-%cp%|-%cp%)(-%arch%.whl)",,,,,"(\S+)",,\"''',n.decode('utf-8'))[0]
-echo.except IndexError:>> "%~dp0getnightly.py"
-echo.    print("No nightly-build yet")>> "%~dp0getnightly.py"
-echo.file_name = ''.join(m[:len(m)-1])>> "%~dp0getnightly.py"
-echo.file_id = m[-1]>> "%~dp0getnightly.py"
+echo.import os.path as op; import datetime as dt>> "%~dp0getnightly.py"
+echo.fid = {'cp27_win32':'0B-080DPVLKs2amMxY3o1cHNzRjQ',>> "%~dp0getnightly.py"
+echo.       'cp34_win32':'0B-080DPVLKs2TnpLb25lcUh3d0U',>> "%~dp0getnightly.py"
+echo.       'cp27_win_amd64':'0B-080DPVLKs2TmRrMExqLVJ1M28',>> "%~dp0getnightly.py"
+echo.       'cp34_win_amd64':'0B-080DPVLKs2eDlqQlJCRldkNE0'}>> "%~dp0getnightly.py"
+>>"%~dp0getnightly.py" echo.y = '{:%%d%%m%%Y}'.format(dt.datetime.now()-dt.timedelta(days=1))
+echo.file_id = fid['%cpwhl%_%arch%']>>"%~dp0getnightly.py"
+echo.file_name = 'Kivy-%master%.dev0_'+y+'-%cpwhl%-%cp%-%arch%.whl'>> "%~dp0getnightly.py"
 echo.link = 'https://docs.google.com/uc?id='+file_id>> "%~dp0getnightly.py"
-echo.p = os.path.dirname(os.path.abspath(__file__))+'\\whls\\'+file_name.replace('%cp%','none')>> "%~dp0getnightly.py"
+echo.p = op.dirname(op.abspath(__file__))+'\\whls\\'+file_name.replace('%cp%','none')>> "%~dp0getnightly.py"
 echo.try:>>"%~dp0getnightly.py"
 echo.    wget.download(link,p)>> "%~dp0getnightly.py"
 echo.except:>>"%~dp0getnightly.py"
@@ -327,12 +326,12 @@ echo.        import ssl>>"%~dp0getnightly.py"
 echo.        import urllib.request as ulib>>"%~dp0getnightly.py"
 echo.        f.write(ulib.urlopen(link,context=ssl._create_unverified_context()).read())>>"%~dp0getnightly.py"
 echo.print('Wheel downloaded...')>> "%~dp0getnightly.py"
-echo.root=os.path.dirname(os.path.abspath(sys.executable))>> "%~dp0getnightly.py"
-echo.whl=os.path.basename(max(glob.glob(root+'/whls/*.[Ww][Hh][Ll]*'),key=os.path.getctime))>>"%~dp0getnightly.py"
+echo.root=op.dirname(op.abspath(sys.executable))>> "%~dp0getnightly.py"
+echo.whl=op.basename(max(glob.glob(root+'/whls/*.[Ww][Hh][Ll]*'),key=op.getctime))>>"%~dp0getnightly.py"
 echo.new='Kivy-%master%.dev0-%cpwhl%-none-%arch%.whl'>> "%~dp0getnightly.py"
 echo.shutil.copy2(root+'\\whls\\'+whl,root+'\\whls\\'+new)>> "%~dp0getnightly.py"
 python "%~dp0getnightly.py"
-del "%~dp0getnightly.py"
+if not defined DEBUG (del "%~dp0getnightly.py")
 if %first%==0 (
     if exist "%~dp0whls\Kivy-%master%.dev0-%cpwhl%-none-%arch%.whl" (
         python -m pip uninstall -y kivy
@@ -353,7 +352,9 @@ echo Running touchtracer demo...
 find /c "unsuccessful" "%~dp0error.txt"
 del /q "%~dp0error.txt"
 if not %errorlevel%==1 (
-    start python "%~dp0share\kivy-examples\demo\touchtracer\main.py"
+    if not defined DEBUG (
+        start python "%~dp0share\kivy-examples\demo\touchtracer\main.py"
+    )
     (echo cp=%cp%) > "%~dp0config.kivyinstaller"
     (echo cpwhl=%cpwhl%) >> "%~dp0config.kivyinstaller"
     (echo stable=%stable%) >> "%~dp0config.kivyinstaller"

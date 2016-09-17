@@ -1,3 +1,4 @@
+set DEBUG=1
 set choice_privileges=n
 set choice_python=2
 set choice_ext=n
