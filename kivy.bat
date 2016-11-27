@@ -1,5 +1,5 @@
 ::Author: KeyWeeUsr @ https://github.com/KeyWeeUsr
-::Version: 1.9
+::Version: 2.0
 ::Inspired by kivy.bat file for kivy1.8.0
 ::To reset file just delete "config.kivyinstaller"
 ::Bitsadmin is available since winXP SP2
@@ -20,7 +20,7 @@ set pyversion=0
 set gstreamer=0
 set master=1.9.2
 set installkivy=1
-set installerversion=1.9
+set installerversion=2.0
 set admin=1
 setlocal ENABLEDELAYEDEXPANSION
 ver | find "5.1" >nul && set xp=1
@@ -309,10 +309,12 @@ if %stable%==1 (
 mkdir "%~dp0whls"
 echo.import os,glob,sys,re,requests,wget,datetime,shutil> "%~dp0getnightly.py"
 echo.import os.path as op; import datetime as dt>> "%~dp0getnightly.py"
-echo.fid = {'cp27_win32':'0B-080DPVLKs2amMxY3o1cHNzRjQ',>> "%~dp0getnightly.py"
-echo.       'cp34_win32':'0B-080DPVLKs2TnpLb25lcUh3d0U',>> "%~dp0getnightly.py"
-echo.       'cp27_win_amd64':'0B-080DPVLKs2TmRrMExqLVJ1M28',>> "%~dp0getnightly.py"
-echo.       'cp34_win_amd64':'0B-080DPVLKs2eDlqQlJCRldkNE0'}>> "%~dp0getnightly.py"
+echo.fid = {'cp27_win32':'0B-ydZwFoA2uQckNqaXhqMDZEQlk',>> "%~dp0getnightly.py"
+echo.       'cp34_win32':'0B-ydZwFoA2uQYXhBQ2xlenR3M0k',>> "%~dp0getnightly.py"
+echo.       'cp27_win_amd64':'0B-ydZwFoA2uQOGtScEhxVHFxUDQ',>> "%~dp0getnightly.py"
+echo.       'cp34_win_amd64':'0B-ydZwFoA2uQV3hDa0lZNm1WYlE',>> "%~dp0getnightly.py"
+echo.       'cp35_win32':'0B-ydZwFoA2uQYWd3UGhpOXNIaG8',>> "%~dp0getnightly.py"
+echo.       'cp35_win_amd64':'0B-ydZwFoA2uQRHl4cmhqR3o5aGs'}>> "%~dp0getnightly.py"
 >>"%~dp0getnightly.py" echo.y = '{:%%d%%m%%Y}'.format(dt.datetime.now()-dt.timedelta(days=1))
 echo.file_id = fid['%cpwhl%_%arch%']>>"%~dp0getnightly.py"
 echo.file_name = 'Kivy-%master%.dev0_'+y+'-%cpwhl%-%cp%-%arch%.whl'>> "%~dp0getnightly.py"
