@@ -1,5 +1,5 @@
 ::Author: KeyWeeUsr @ https://github.com/KeyWeeUsr
-::Version: 2.0
+::Version: 2.1
 ::Inspired by kivy.bat file for kivy1.8.0
 ::To reset file just delete "config.kivyinstaller"
 ::Bitsadmin is available since winXP SP2
@@ -20,7 +20,7 @@ set pyversion=0
 set gstreamer=0
 set master=1.9.2
 set installkivy=1
-set installerversion=2.0
+set installerversion=2.1
 set admin=1
 setlocal ENABLEDELAYEDEXPANSION
 ver | find "5.1" >nul && set xp=1
@@ -309,16 +309,16 @@ if %stable%==1 (
 mkdir "%~dp0whls"
 echo.import os,glob,sys,re,requests,wget,datetime,shutil> "%~dp0getnightly.py"
 echo.import os.path as op; import datetime as dt>> "%~dp0getnightly.py"
-echo.fid = {'cp27_win32':'0B-ydZwFoA2uQckNqaXhqMDZEQlk',>> "%~dp0getnightly.py"
-echo.       'cp34_win32':'0B-ydZwFoA2uQYXhBQ2xlenR3M0k',>> "%~dp0getnightly.py"
-echo.       'cp27_win_amd64':'0B-ydZwFoA2uQOGtScEhxVHFxUDQ',>> "%~dp0getnightly.py"
-echo.       'cp34_win_amd64':'0B-ydZwFoA2uQV3hDa0lZNm1WYlE',>> "%~dp0getnightly.py"
-echo.       'cp35_win32':'0B-ydZwFoA2uQYWd3UGhpOXNIaG8',>> "%~dp0getnightly.py"
-echo.       'cp35_win_amd64':'0B-ydZwFoA2uQRHl4cmhqR3o5aGs'}>> "%~dp0getnightly.py"
+echo.fid = {'cp27_win32':'Kivy-1.9.2.dev0-cp27-cp27m-win32.whl',>> "%~dp0getnightly.py"
+echo.       'cp34_win32':'Kivy-1.9.2.dev0-cp34-cp34m-win32.whl',>> "%~dp0getnightly.py"
+echo.       'cp35_win32':'Kivy-1.9.2.dev0-cp35-cp35m-win32.whl',>> "%~dp0getnightly.py"
+echo.       'cp27_win_amd64':'Kivy-1.9.2.dev0-cp27-cp27m-win_amd64.whl',>> "%~dp0getnightly.py"
+echo.       'cp34_win_amd64':'Kivy-1.9.2.dev0-cp34-cp34m-win_amd64.whl',>> "%~dp0getnightly.py"
+echo.       'cp35_win_amd64':'Kivy-1.9.2.dev0-cp35-cp35m-win_amd64.whl'}>> "%~dp0getnightly.py"
 >>"%~dp0getnightly.py" echo.y = '{:%%d%%m%%Y}'.format(dt.datetime.now()-dt.timedelta(days=1))
 echo.file_id = fid['%cpwhl%_%arch%']>>"%~dp0getnightly.py"
 echo.file_name = 'Kivy-%master%.dev0_'+y+'-%cpwhl%-%cp%-%arch%.whl'>> "%~dp0getnightly.py"
-echo.link = 'https://docs.google.com/uc?id='+file_id>> "%~dp0getnightly.py"
+echo.link = 'https://kivy.org/downloads/appveyor/kivy/'+file_id>> "%~dp0getnightly.py"
 echo.p = op.dirname(op.abspath(__file__))+'\\whls\\'+file_name.replace('%cp%','none')>> "%~dp0getnightly.py"
 echo.try:>>"%~dp0getnightly.py"
 echo.    wget.download(link,p)>> "%~dp0getnightly.py"
