@@ -1,7 +1,11 @@
 Getting started
 ===============
 
-.. warning:: This batch isn't for compiling! (May change in future.)
+.. note::
+
+   This batch isn't by default meant for compiling, however it provides
+   commands to download one of GCC of MSVC tools that can be used for
+   compiling later.
 
 KivyInstaller works with ``pip`` and gets Kivy from ``.whl`` files. It supports
 32bit and 64bit Python versions, so you can easily download the one you need.

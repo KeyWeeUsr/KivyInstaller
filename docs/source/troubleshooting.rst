@@ -4,20 +4,6 @@ Troubleshooting
 This section provides solutions to the known problems a user could encounter
 while using the KivyInstaller.
 
-Update from v1.0
-----------------
-
-KivyInstaller 1.0 didn't have an option for self-updating, therefore
-``update_v1.bat`` is available for manual updating to the latest version which
-has this kind of updating implemented. Copy ``update_v1.bat`` inside folder
-with ``kivy.bat`` and run it.
-
-If anything goes wrong, there will be ``update_v1.log`` file available. After
-successful update you can remove the updating file(s).
-
-For anyone who would clone whole repo - updater will not run if your version
-isn't ``1.0``. If it annoys you, remove it.
-
 Known problems
 --------------
 

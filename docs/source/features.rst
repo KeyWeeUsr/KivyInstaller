@@ -18,6 +18,18 @@ Packages
 - wget
 - wheel
 
+Extra packages
+--------------
+
+There are optional packages you may want to install later (see ``kivy help``
+command), however compilers need some post-install editing, otherwise they
+won't work with Kivy. A command for installing compiler also opens
+a documentation page related to the chosen compiler.:
+
+- Kivy Designer
+- MinGWPy (GCC)
+- Visual C++ Build Tools (MSVC)
+
 Extra PATH
 ----------
 

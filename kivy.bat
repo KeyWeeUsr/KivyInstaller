@@ -1,5 +1,5 @@
 ::Author: KeyWeeUsr @ https://github.com/KeyWeeUsr
-::Version: 2.1
+::Version: 2.2
 ::Inspired by kivy.bat file for kivy1.8.0
 ::To reset file just delete "config.kivyinstaller"
 ::Bitsadmin is available since winXP SP2
@@ -20,7 +20,7 @@ set pyversion=0
 set gstreamer=0
 set master=1.9.2
 set installkivy=1
-set installerversion=2.1
+set installerversion=2.2
 set admin=1
 setlocal ENABLEDELAYEDEXPANSION
 ver | find "5.1" >nul && set xp=1
@@ -122,6 +122,11 @@ set /p choice_gst="Install gstreamer? y/n"
 if %choice_gst%==y (
     set gstreamer=1
 )
+set /p choice_shrt="Install Kivy Designer? y/n"
+if %choice_dsgn%==y (
+    set designer=1
+)
+
 set /p choice_shrt="Make shortcuts? y/n"
 if %choice_shrt%==y (
     set shortcuts=1
@@ -279,6 +284,11 @@ echo Optional:
 echo   idle                    Python(.py) text editor with syntax highlighting
 echo   pyinstaller             Executable packager for Python programs
 echo.
+echo Extra install:
+echo   getdesigner             Install Kivy Designer (python -m designer)
+echo   getgcc                  Install GNU Compiler Collection (mingw32-make, gcc)
+echo   getmsvc                 Opens a link for downloading Visual C++ Build Tools
+echo.
 echo ExtraPATH:
 echo   Write new PATH as it is. Separate with ; . No quotes, no ; at the end.
 goto end
@@ -304,17 +314,20 @@ if %gstreamer%==1 (
 if %stable%==1 (
     python -m pip uninstall -y kivy
     python -m pip install kivy
+    if !designer!==1 (
+        python -m pip install https://github.com/kivy/kivy-designer/zipball/master
+    )
     goto kivyend
 )
 mkdir "%~dp0whls"
 echo.import os,glob,sys,re,requests,wget,datetime,shutil> "%~dp0getnightly.py"
 echo.import os.path as op; import datetime as dt>> "%~dp0getnightly.py"
-echo.fid = {'cp27_win32':'Kivy-1.9.2.dev0-cp27-cp27m-win32.whl',>> "%~dp0getnightly.py"
-echo.       'cp34_win32':'Kivy-1.9.2.dev0-cp34-cp34m-win32.whl',>> "%~dp0getnightly.py"
-echo.       'cp35_win32':'Kivy-1.9.2.dev0-cp35-cp35m-win32.whl',>> "%~dp0getnightly.py"
-echo.       'cp27_win_amd64':'Kivy-1.9.2.dev0-cp27-cp27m-win_amd64.whl',>> "%~dp0getnightly.py"
-echo.       'cp34_win_amd64':'Kivy-1.9.2.dev0-cp34-cp34m-win_amd64.whl',>> "%~dp0getnightly.py"
-echo.       'cp35_win_amd64':'Kivy-1.9.2.dev0-cp35-cp35m-win_amd64.whl'}>> "%~dp0getnightly.py"
+echo.fid = {'cp27_win32':'Kivy-%master%.dev0-cp27-cp27m-win32.whl',>> "%~dp0getnightly.py"
+echo.       'cp34_win32':'Kivy-%master%.dev0-cp34-cp34m-win32.whl',>> "%~dp0getnightly.py"
+echo.       'cp35_win32':'Kivy-%master%.dev0-cp35-cp35m-win32.whl',>> "%~dp0getnightly.py"
+echo.       'cp27_win_amd64':'Kivy-%master%.dev0-cp27-cp27m-win_amd64.whl',>> "%~dp0getnightly.py"
+echo.       'cp34_win_amd64':'Kivy-%master%.dev0-cp34-cp34m-win_amd64.whl',>> "%~dp0getnightly.py"
+echo.       'cp35_win_amd64':'Kivy-%master%.dev0-cp35-cp35m-win_amd64.whl'}>> "%~dp0getnightly.py"
 >>"%~dp0getnightly.py" echo.y = '{:%%d%%m%%Y}'.format(dt.datetime.now()-dt.timedelta(days=1))
 echo.file_id = fid['%cpwhl%_%arch%']>>"%~dp0getnightly.py"
 echo.file_name = 'Kivy-%master%.dev0_'+y+'-%cpwhl%-%cp%-%arch%.whl'>> "%~dp0getnightly.py"
@@ -327,7 +340,7 @@ echo.    with open(p,'wb') as f:>>"%~dp0getnightly.py"
 echo.        import ssl>>"%~dp0getnightly.py"
 echo.        import urllib.request as ulib>>"%~dp0getnightly.py"
 echo.        f.write(ulib.urlopen(link,context=ssl._create_unverified_context()).read())>>"%~dp0getnightly.py"
-echo.print('Wheel downloaded...')>> "%~dp0getnightly.py"
+echo.print('\nWheel downloaded...')>> "%~dp0getnightly.py"
 echo.root=op.dirname(op.abspath(sys.executable))>> "%~dp0getnightly.py"
 echo.whl=op.basename(max(glob.glob(root+'/whls/*.[Ww][Hh][Ll]*'),key=op.getctime))>>"%~dp0getnightly.py"
 echo.new='Kivy-%master%.dev0-%cpwhl%-none-%arch%.whl'>> "%~dp0getnightly.py"
@@ -371,7 +384,9 @@ if not %errorlevel%==1 (
     (echo installkivy=%installkivy%) >> "%~dp0config.kivyinstaller"
     (echo shrtct=%shrtct%) >> "%~dp0config.kivyinstaller"
     (echo admin=%admin%) >> "%~dp0config.kivyinstaller"
-    type nul > "%~dp0extrapath.kivyinstaller"
+    if not exist "%~dp0extrapath.kivyinstaller" (
+        type nul > "%~dp0extrapath.kivyinstaller"
+    )
 ) else (
     echo Kivy was not installed properly!
 )
@@ -392,21 +407,6 @@ goto end
 :rmshortcuts
 del /q "%sendto%\Kivy%shrtct%.bat"
 del /q "%taskbar%\Kivy%shrtct%.bat"
-goto end
-
-:pack
-for /f %%a in ("%2") do for %%b in ("%%~dpa\.") do set n=%%~nxb
-for /f %%a in ("%2") do for %%b in ("%%~dpa") do set d=%%b
-echo Collecting data...
-python -m PyInstaller --debug --name "%n%" "%2"
-echo Editing .spec file...
-set d=%d:\=\\\\%
-set f=from kivy.deps import sdl2, glew\na = 
-set t=a.datas,*[Tree(p) for p in (sdl2.dep_bins + glew.dep_bins)],
-python -c "o=open;f=o('%n%.spec');t=f.read();f.close();f=o('%n%.spec','w');f.write(t.replace('\na = ','%f%').replace('a.datas,','%t%').replace('T(exe,','T(exe,Tree(\'%d:"=%\'),'));f.close();"
-echo Packaging...
-python -m PyInstaller "%n%.spec"
-del /q "%~dp0%n%.spec"
 goto end
 
 :installed
@@ -433,6 +433,17 @@ if [%1]==[update] (
     goto rmshortcuts
 ) else if [%1]==[pack] (
     goto pack
+) else if [%1]==[getdesigner] (
+    python -m pip install -I -U https://github.com/kivy/kivy-designer/zipball/master
+    goto end
+) else if [%1]==[getgcc] (
+    python -m pip install -I -U -i https://pypi.anaconda.org/carlkl/simple mingwpy
+    start "" "https://kivy.org/docs/installation/installation-windows.html#use-development-kivy"
+    goto end
+) else if [%1]==[getmsvc] (
+    start "" "http://landinghub.visualstudio.com/visual-cpp-build-tools"
+    start "" "https://kivy.org/docs/installation/installation-windows.html#msvc"
+    goto end
 ) else if [%1]==[help] (
     goto help
 )
@@ -461,7 +472,7 @@ echo ###########################################################################
 python -c "import sys; print('.'.join(str(x) for x in sys.version_info[:3]))" > temp.txt
 set /p python_version=<temp.txt
 del temp.txt
-start "" /min /wait python.exe -c "from kivy import __version__;f=open('temp.txt','w');f.write(str(__version__)[:5]);f.close()"
+start "" /min /wait python.exe -c "import kivy;f=open('temp.txt','w');f.write(kivy.__version__);f.close()"
 set /p kivy_version=<temp.txt
 del temp.txt
 python -c "exec(\"try:\n    import os.path as o,glob,re,datetime,sys;    p=o.dirname(o.abspath(sys.executable));    m=re.findall('(\d{8})', o.basename(max(glob.glob(p+'/whls/*.[Ww][Hh][Ll]*'), key=o.getctime))[:-4])[0];    print(m[:2]+datetime.date(1900, int(m[2:4]), 1).strftime('%%B')[:3]+m[4:]);\nexcept:\n    pass\")">t
@@ -471,7 +482,7 @@ echo - KivyInstaller: %installerversion%
 echo - Python:        %python_version%
 echo - Kivy:          %kivy_version%
 echo - Wheel:         %wheel_version%
-echo - New wheel:     %~n0 update or %~n0 updatemaster
+echo - Update Kivy:   %~n0 update or %~n0 updatemaster
 echo - Examples:      share\kivy-examples
 echo - Launch:        %~n0 main.py or python main.py
 echo - Pack:          %~n0 pack "<path>"
@@ -480,3 +491,23 @@ echo ###########################################################################
 echo.
 cmd
 exit
+
+:pack
+if not [%1]==[pack] (
+    pause
+    exit
+)
+for /f %%a in ("%2") do for %%b in ("%%~dpa\.") do set n=%%~nxb
+for /f %%a in ("%2") do for %%b in ("%%~dpa") do set d=%%b
+echo Collecting data...
+python -m PyInstaller --debug --name "%n%" "%2"
+echo Editing .spec file...
+set d=%d:\=\\\\%
+set f=from kivy.deps import sdl2, glew\na = 
+set t=a.datas,*[Tree(p) for p in (sdl2.dep_bins + glew.dep_bins)],
+:: %d:"=% strips double-quotes
+python -c "o=open;f=o('%n%.spec');t=f.read();f.close();f=o('%n%.spec','w');f.write(t.replace('\na = ','%f%').replace('a.datas,','%t%').replace('T(exe,','T(exe,Tree(\'%d:"=%\'),'));f.close();"
+echo Packaging...
+python -m PyInstaller "%n%.spec"
+del /q "%~dp0%n%.spec"
+goto end
