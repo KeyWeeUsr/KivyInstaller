@@ -122,7 +122,7 @@ set /p choice_gst="Install gstreamer? y/n"
 if %choice_gst%==y (
     set gstreamer=1
 )
-set /p choice_shrt="Install Kivy Designer? y/n"
+set /p choice_dsgn="Install Kivy Designer? y/n"
 if %choice_dsgn%==y (
     set designer=1
 )
