@@ -1,5 +1,5 @@
 ::Author: KeyWeeUsr @ https://github.com/KeyWeeUsr
-::Version: 2.2
+::Version: 2.3
 ::Inspired by kivy.bat file for kivy1.8.0
 ::To reset file just delete "config.kivyinstaller"
 ::Bitsadmin is available since winXP SP2
@@ -12,15 +12,15 @@ set first=1
 set cpwhl=0
 set stable=1
 set cp2=cp27
-set cp3=cp34
-set py3=3.4.4
+set cp3=cp35
+set py3=3.5.2
 set arch=win32
-set py2=2.7.11
+set py2=2.7.13
 set pyversion=0
 set gstreamer=0
 set master=1.9.2
 set installkivy=1
-set installerversion=2.2
+set installerversion=2.3
 set admin=1
 setlocal ENABLEDELAYEDEXPANSION
 ver | find "5.1" >nul && set xp=1
@@ -28,6 +28,7 @@ title = KivyInstaller %installerversion%
 set sendto=%appdata%\Microsoft\Windows\SendTo
 set taskbar=%appdata%\Microsoft\Internet Explorer\Quick Launch
 set addlocal=ADDLOCAL^=DefaultFeature,PrivateCRT,TclTk,Documentation,Tools,Testsuite
+set py35addlocal=Shortcuts=0 Include_launcher=0 Include_pip=0
 if %xp%==1 (
     set sendto=%userprofile%\SendTo
 )
@@ -47,6 +48,12 @@ if exist "%~dp0config.kivyinstaller" (
 ) else (
     echo Config not found, running installation...
     set first=1
+)
+
+if %py3% geq 3.5.0 (
+   set pyext=.exe
+) else (
+   set pyext=.msi
 )
 
 if not %first%==1 (
@@ -98,8 +105,10 @@ if %choice_python%==2 (
 set /p choice_ext="Register python extensions (.py, .pyc, ...)? y/n"
 if %choice_ext%==y (
     set addlocal=%addlocal%,Extensions
+    set py35addlocal=%py35addlocal% AssociateFiles=1
 ) else if %choice_ext%==n (
     set addlocal=%addlocal%
+    set py35addlocal=%py35addlocal% AssociateFiles=0
 ) else (
     goto extensions
 )
@@ -137,38 +146,61 @@ if !kivycontinue!==y (
     goto check
 )
 if %arch%==win32 (
-    if exist "%~dp0py%pyversion%.msi" (
+    if exist "%~dp0py%pyversion%!pyext!" (
         echo Installer is already downloaded!
     ) else (
         echo Downloading Python installer...
-        bitsadmin.exe /transfer "GetPythonMSI" "https://www.python.org/ftp/python/%pyversion%/python-%pyversion%.msi" "%~dp0py%pyversion%.msi"
+        bitsadmin.exe /transfer "GetPython%pyversion%!pyext!" "https://www.python.org/ftp/python/%pyversion%/python-%pyversion%!pyext!" "%~dp0py%pyversion%!pyext!"
         echo Installing...
     )
     if %admin%==0 (
-        copy "%~dp0py%pyversion%.msi" "%~dp0py%pyversion%_.msi" >nul
-        msiexec.exe /a "%~dp0py%pyversion%.msi" /qb /L*V "%~dp0msi.log" ALLUSERS=0 TARGETDIR="%~dp0kivy" CURRENTDIRECTORY="%~dp0" %addlocal%
-        for /f "tokens=*" %%f in ('dir /b "%~dp0kivy"') do move "%~dp0kivy\%%f" "%~dp0%%f" >nul
+        copy "%~dp0py%pyversion%!pyext!" "%~dp0py%pyversion%_!pyext!" >nul
+        if !pyext!==.msi (
+            msiexec.exe /a "%~dp0py%pyversion%.msi" /qb /L*V "%~dp0msi.log" ALLUSERS=0 TARGETDIR="%~dp0kivy" CURRENTDIRECTORY="%~dp0" %addlocal%
+            for /f "tokens=*" %%f in ('dir /b "%~dp0kivy"') do move "%~dp0kivy\%%f" "%~dp0%%f" >nul
+        ) else if !pyext!==.exe (
+            "%~dp0py%pyversion%.exe" /quiet /log "%~dp0msi.log" InstallAllUsers=0 TargetDir=%~dp0 %py35addlocal% OptionalFeaturesRegistryKey='' TargetDirRegistryKey=''
+        )
+        REM fix extracting only (forbid adding to "Programs and Features)
     ) else (
-        msiexec.exe /i "%~dp0py%pyversion%.msi" /qb /L*V "%~dp0msi.log" ALLUSERS=0 TARGETDIR="%~dp0" CURRENTDIRECTORY="%~dp0" %addlocal%
+        if !pyext!==.msi (
+            msiexec.exe /i "%~dp0py%pyversion%.msi" /qb /L*V "%~dp0msi.log" ALLUSERS=0 TARGETDIR="%~dp0" CURRENTDIRECTORY="%~dp0" %addlocal%
+        ) else if !pyext!==.exe (
+            "%~dp0py%pyversion%.exe" /quiet /log "%~dp0msi.log" InstallAllUsers=0 TargetDir=%~dp0 %py35addlocal%
+        )
     )
 ) else (
-    if exist "%~dp0py%pyversion%.amd64.msi" (
+    set amdext=.amd64
+    if !pyext!==.exe (
+        set amdext=-amd64
+    )
+    if exist "%~dp0py%pyversion%!amdext!!pyext!" (
         echo Installer is already downloaded!
     ) else (
-        bitsadmin.exe /transfer "GetPythonMSI" "https://www.python.org/ftp/python/%pyversion%/python-%pyversion%.amd64.msi" "%~dp0py%pyversion%.amd64.msi"
+        bitsadmin.exe /transfer "GetPython%pyversion%!amdext!!pyext!" "https://www.python.org/ftp/python/%pyversion%/python-%pyversion%!amdext!!pyext!" "%~dp0py%pyversion%!amdext!!pyext!"
         echo Installing...
     )
     if %admin%==0 (
-        copy "%~dp0py%pyversion%.msi" "%~dp0py%pyversion%_.msi" >nul
-        msiexec.exe /a "%~dp0py%pyversion%.amd64.msi" /qb /L*V "%~dp0msi.log" ALLUSERS=0 TARGETDIR="%~dp0kivy" CURRENTDIRECTORY="%~dp0" %addlocal%
-        for /f "tokens=*" %%f in ('dir /b "%~dp0kivy"') do move "%~dp0kivy\%%f" "%~dp0%%f" >nul
+        copy "%~dp0py%pyversion%!amdext!.msi" "%~dp0py%pyversion%_!amdext!.msi" >nul
+        if !pyext!==.msi (
+            msiexec.exe /a "%~dp0py%pyversion%!amdext!.msi" /qb /L*V "%~dp0msi.log" ALLUSERS=0 TARGETDIR="%~dp0kivy" CURRENTDIRECTORY="%~dp0" %addlocal%
+            for /f "tokens=*" %%f in ('dir /b "%~dp0kivy"') do move "%~dp0kivy\%%f" "%~dp0%%f" >nul
+        ) else if !pyext!==.exe (
+            "%~dp0py%pyversion%!amdext!.exe" /quiet /log "%~dp0msi.log" InstallAllUsers=0 TargetDir=%~dp0 %py35addlocal% OptionalFeaturesRegistryKey='' TargetDirRegistryKey=''
+        )
     ) else (
-        msiexec.exe /i "%~dp0py%pyversion%.amd64.msi" /qb /L*V "%~dp0msi.log" ALLUSERS=0 TARGETDIR="%~dp0" CURRENTDIRECTORY="%~dp0" %addlocal%
+        if !pyext!==.msi (
+            msiexec.exe /i "%~dp0py%pyversion%!amdext!.msi" /qb /L*V "%~dp0msi.log" ALLUSERS=0 TARGETDIR="%~dp0" CURRENTDIRECTORY="%~dp0" %addlocal%
+        ) else if !pyext!==.exe (
+            "%~dp0py%pyversion%!amdext!.exe" /quiet /log "%~dp0msi.log" InstallAllUsers=0 TargetDir=%~dp0 %py35addlocal%
+        )
     )
 )
 if %admin%==0 (
-    del /q "%~dp0py%pyversion%.msi"
-    move /y "%~dp0py%pyversion%_.msi" "%~dp0py%pyversion%.msi" >nul
+    del /q "%~dp0py%pyversion%!pyext!"
+    move /y "%~dp0py%pyversion%_!pyext!" "%~dp0py%pyversion%!pyext!" >nul
+    del /q "%~dp0py%pyversion%!amdext!!pyext!"
+    move /y "%~dp0py%pyversion%_!amdext!!pyext!" "%~dp0py%pyversion%!amdext!!pyext!" >nul
 )
 goto check
 
@@ -177,8 +209,12 @@ set /p choice_uninstall="Uninstall? y/n"
 set /p choice_pipcache="Remove cached pip files? y/n"
 set /p choice_dist="Remove dist folder? y/n"
 if %arch%==win32 (
-    if not exist "%~dp0py%pyversion%.msi" (
-        bitsadmin.exe /transfer "GetPythonMSI" "https://www.python.org/ftp/python/%pyversion%/python-%pyversion%.msi" "%~dp0py%pyversion%.msi"
+    set amdext=.amd64
+    if !pyext!==.exe (
+        set amdext=-amd64
+    )
+    if not exist "%~dp0py%pyversion%!pyext!" (
+        bitsadmin.exe /transfer "GetPython%pyversion%!pyext!" "https://www.python.org/ftp/python/%pyversion%/python-%pyversion%!pyext!" "%~dp0py%pyversion%!pyext!"
     )
     if %choice_uninstall%==y (
         if %admin%==0 (
@@ -186,12 +222,16 @@ if %arch%==win32 (
             for /f "delims=" %%i in ('dir /b') do (rmdir "%%i" /s/q || del "%%i" /s/q)
             attrib -r -a *.bat
         ) else (
-            msiexec.exe /x "%~dp0py%pyversion%.msi" /qb
+            if !pyext!==.msi (
+                msiexec.exe /x "%~dp0py%pyversion%.msi" /qb
+            ) else if !pyext!==.exe (
+                "%~dp0py%pyversion%.msi" /uninstall
+            )
         )
     ) else (goto end)
 ) else (
-    if not exist "%~dp0py%pyversion%.amd64.msi" (
-        bitsadmin.exe /transfer "GetPythonMSI" "https://www.python.org/ftp/python/%pyversion%/python-%pyversion%.amd64.msi" "%~dp0py%pyversion%.amd64.msi"
+    if not exist "%~dp0py%pyversion%%amdext%!pyext!" (
+        bitsadmin.exe /transfer "GetPython%pyversion%%amdext%!pyext!" "https://www.python.org/ftp/python/%pyversion%/python-%pyversion%%amdext%!pyext!" "%~dp0py%pyversion%%amdext%!pyext!"
     )
     if %choice_uninstall%==y (
         if %admin%==0 (
@@ -199,7 +239,11 @@ if %arch%==win32 (
             for /f "delims=" %%i in ('dir /b') do (rmdir "%%i" /s/q || del "%%i" /s/q)
             attrib -r -a *.bat
         ) else (
-            msiexec.exe /x "%~dp0py%pyversion%.amd64.msi" /qb
+            if !pyext!==.msi (
+                msiexec.exe /x "%~dp0py%pyversion%%amdext%.msi" /qb
+            ) else if !pyext!==.exe (
+                "%~dp0py%pyversion%%amdext%.msi" /uninstall
+            )
         )
     ) else (goto end)
 )
@@ -360,7 +404,9 @@ if %first%==0 (
 del /q "%~dp0whls\Kivy-%master%.dev0-%cpwhl%-none-%arch%.whl"
 
 :kivyend
-del /q "%~dp0msi.log"
+if not defined DEBUG (
+    del /q "%~dp0msi.log"
+)
 set PATH=%~dp0;%~dp0Tools;%~dp0Scripts;%~dp0share\sdl2\bin;%~dp0Lib\idlelib;%PATH%
 echo Running touchtracer demo...
 >"%~dp0error.txt" python -c "exec(\"try:\n    import kivy;\nexcept ImportError:\n    print('unsuccessful');\")"

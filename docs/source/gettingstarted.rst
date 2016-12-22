@@ -20,8 +20,9 @@ connection.
 Defaults
 --------
 
-- Python versions ``2.7.11``, ``3.4.4``
+- Python versions ``2.7.13``, ``3.5.2``
 - kivy-master ``1.9.2``
+- kivy-stable is from pypi
 
 Change them freely inside batch file if you need.
 
@@ -67,6 +68,11 @@ reinstall.
 .. note:: It may occur that MSI installer becames broken for non-admin type
    of installation. In this case the installer needs to be completely removed
    and redownloaded.
+
+.. warning:: This type of installation since Python ``3.5.0`` leaves a trace
+   in `Programs and Features` as a casual installed application, but doesn't
+   require admin privileges. When this issue is fixed, the warning will be
+   removed.
 
 .. |installvid| replace:: video
 .. _installvid: https://youtu.be/ch_ILDBEaok
