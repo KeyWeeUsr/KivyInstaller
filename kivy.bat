@@ -92,6 +92,7 @@ if %choice_python%==2 (
     set cp=%cp2%m
     set cpwhl=%cp2%
     set shrtct=%cp2:~2%
+    set pyext=.msi
 ) else if %choice_python%==3 (
     set pyversion=%py3%
     set cp=%cp3%m
