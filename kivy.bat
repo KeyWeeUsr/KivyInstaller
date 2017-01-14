@@ -1,5 +1,5 @@
 ::Author: KeyWeeUsr @ https://github.com/KeyWeeUsr
-::Version: 2.3
+::Version: 2.4
 ::Inspired by kivy.bat file for kivy1.8.0
 ::To reset file just delete "config.kivyinstaller"
 ::Bitsadmin is available since winXP SP2
@@ -20,7 +20,7 @@ set pyversion=0
 set gstreamer=0
 set master=1.9.2
 set installkivy=1
-set installerversion=2.3
+set installerversion=2.4
 set admin=1
 setlocal ENABLEDELAYEDEXPANSION
 ver | find "5.1" >nul && set xp=1
@@ -151,7 +151,15 @@ if %arch%==win32 (
         echo Installer is already downloaded!
     ) else (
         echo Downloading Python installer...
-        bitsadmin.exe /transfer "GetPython%pyversion%!pyext!" "https://www.python.org/ftp/python/%pyversion%/python-%pyversion%!pyext!" "%~dp0py%pyversion%!pyext!"
+        if !pyext!==.exe (
+            if %admin%==0 (
+                bitsadmin.exe /transfer "GetPython%pyversion%-webinstall!pyext!" "https://www.python.org/ftp/python/%pyversion%/python-%pyversion%-webinstall!pyext!" "%~dp0py%pyversion%-webinstall!pyext!"
+            ) else (
+                bitsadmin.exe /transfer "GetPython%pyversion%!pyext!" "https://www.python.org/ftp/python/%pyversion%/python-%pyversion%!pyext!" "%~dp0py%pyversion%!pyext!"
+            )
+        ) else (
+            bitsadmin.exe /transfer "GetPython%pyversion%!pyext!" "https://www.python.org/ftp/python/%pyversion%/python-%pyversion%!pyext!" "%~dp0py%pyversion%!pyext!"
+        )
         echo Installing...
     )
     if %admin%==0 (
@@ -160,14 +168,30 @@ if %arch%==win32 (
             msiexec.exe /a "%~dp0py%pyversion%.msi" /qb /L*V "%~dp0msi.log" ALLUSERS=0 TARGETDIR="%~dp0kivy" CURRENTDIRECTORY="%~dp0" %addlocal%
             for /f "tokens=*" %%f in ('dir /b "%~dp0kivy"') do move "%~dp0kivy\%%f" "%~dp0%%f" >nul
         ) else if !pyext!==.exe (
-            "%~dp0py%pyversion%.exe" /quiet /log "%~dp0msi.log" InstallAllUsers=0 TargetDir=%~dp0 %py35addlocal% OptionalFeaturesRegistryKey='' TargetDirRegistryKey=''
+            "%~dp0py%pyversion%-webinstall.exe" /quiet /layout "%~dp0\_installers"
+            msiexec.exe /a "%~dp0\_installers\core.msi" TARGETDIR="%~dp0"
+            msiexec.exe /a "%~dp0\_installers\dev.msi" TARGETDIR="%~dp0"
+            msiexec.exe /a "%~dp0\_installers\doc.msi" TARGETDIR="%~dp0"
+            msiexec.exe /a "%~dp0\_installers\exe.msi" TARGETDIR="%~dp0"
+            msiexec.exe /a "%~dp0\_installers\lib.msi" TARGETDIR="%~dp0"
+            msiexec.exe /a "%~dp0\_installers\tcltk.msi" TARGETDIR="%~dp0"
+            msiexec.exe /a "%~dp0\_installers\test.msi" TARGETDIR="%~dp0"
+            msiexec.exe /a "%~dp0\_installers\tools.msi" TARGETDIR="%~dp0"
+            del /q "%~dp0\core.msi"
+            del /q "%~dp0\dev.msi"
+            del /q "%~dp0\doc.msi"
+            del /q "%~dp0\exe.msi"
+            del /q "%~dp0\lib.msi"
+            del /q "%~dp0\tcltk.msi"
+            del /q "%~dp0\test.msi"
+            del /q "%~dp0\tools.msi"
+            rmdir /s /q "%~dp0_installers"
         )
-        REM fix extracting only (forbid adding to "Programs and Features)
     ) else (
         if !pyext!==.msi (
             msiexec.exe /i "%~dp0py%pyversion%.msi" /qb /L*V "%~dp0msi.log" ALLUSERS=0 TARGETDIR="%~dp0" CURRENTDIRECTORY="%~dp0" %addlocal%
         ) else if !pyext!==.exe (
-            "%~dp0py%pyversion%.exe" /quiet /log "%~dp0msi.log" InstallAllUsers=0 TargetDir=%~dp0 %py35addlocal%
+            "%~dp0py%pyversion%.exe" /quiet /log "%~dp0msi.log" DefaultJustForMeTargetDir="%~dp0" InstallAllUsers=0 %py35addlocal%
         )
     )
 ) else (
@@ -178,7 +202,15 @@ if %arch%==win32 (
     if exist "%~dp0py%pyversion%!amdext!!pyext!" (
         echo Installer is already downloaded!
     ) else (
-        bitsadmin.exe /transfer "GetPython%pyversion%!amdext!!pyext!" "https://www.python.org/ftp/python/%pyversion%/python-%pyversion%!amdext!!pyext!" "%~dp0py%pyversion%!amdext!!pyext!"
+        if !pyext!==.exe (
+            if %admin%==0 (
+                bitsadmin.exe /transfer "GetPython%pyversion%!amdext!-webinstall!pyext!" "https://www.python.org/ftp/python/%pyversion%/python-%pyversion%!amdext!-webinstall!pyext!" "%~dp0py%pyversion%!amdext!-webinstall!pyext!"
+            ) else (
+                bitsadmin.exe /transfer "GetPython%pyversion%!amdext!!pyext!" "https://www.python.org/ftp/python/%pyversion%/python-%pyversion%!amdext!!pyext!" "%~dp0py%pyversion%!amdext!!pyext!"
+            )
+        ) else (
+            bitsadmin.exe /transfer "GetPython%pyversion%!amdext!!pyext!" "https://www.python.org/ftp/python/%pyversion%/python-%pyversion%!amdext!!pyext!" "%~dp0py%pyversion%!amdext!!pyext!"
+        )
         echo Installing...
     )
     if %admin%==0 (
@@ -187,13 +219,30 @@ if %arch%==win32 (
             msiexec.exe /a "%~dp0py%pyversion%!amdext!.msi" /qb /L*V "%~dp0msi.log" ALLUSERS=0 TARGETDIR="%~dp0kivy" CURRENTDIRECTORY="%~dp0" %addlocal%
             for /f "tokens=*" %%f in ('dir /b "%~dp0kivy"') do move "%~dp0kivy\%%f" "%~dp0%%f" >nul
         ) else if !pyext!==.exe (
-            "%~dp0py%pyversion%!amdext!.exe" /quiet /log "%~dp0msi.log" InstallAllUsers=0 TargetDir=%~dp0 %py35addlocal% OptionalFeaturesRegistryKey='' TargetDirRegistryKey=''
+            "%~dp0py%pyversion%!amdext!-webinstall.exe" /quiet /layout "%~dp0\_installers"
+            msiexec.exe /a "%~dp0\_installers\core.msi" TARGETDIR="%~dp0"
+            msiexec.exe /a "%~dp0\_installers\dev.msi" TARGETDIR="%~dp0"
+            msiexec.exe /a "%~dp0\_installers\doc.msi" TARGETDIR="%~dp0"
+            msiexec.exe /a "%~dp0\_installers\exe.msi" TARGETDIR="%~dp0"
+            msiexec.exe /a "%~dp0\_installers\lib.msi" TARGETDIR="%~dp0"
+            msiexec.exe /a "%~dp0\_installers\tcltk.msi" TARGETDIR="%~dp0"
+            msiexec.exe /a "%~dp0\_installers\test.msi" TARGETDIR="%~dp0"
+            msiexec.exe /a "%~dp0\_installers\tools.msi" TARGETDIR="%~dp0"
+            del /q "%~dp0\core.msi"
+            del /q "%~dp0\dev.msi"
+            del /q "%~dp0\doc.msi"
+            del /q "%~dp0\exe.msi"
+            del /q "%~dp0\lib.msi"
+            del /q "%~dp0\tcltk.msi"
+            del /q "%~dp0\test.msi"
+            del /q "%~dp0\tools.msi"
+            rmdir /s /q "%~dp0_installers"
         )
     ) else (
         if !pyext!==.msi (
             msiexec.exe /i "%~dp0py%pyversion%!amdext!.msi" /qb /L*V "%~dp0msi.log" ALLUSERS=0 TARGETDIR="%~dp0" CURRENTDIRECTORY="%~dp0" %addlocal%
         ) else if !pyext!==.exe (
-            "%~dp0py%pyversion%!amdext!.exe" /quiet /log "%~dp0msi.log" InstallAllUsers=0 TargetDir=%~dp0 %py35addlocal%
+            "%~dp0py%pyversion%!amdext!.exe" /quiet /log "%~dp0msi.log" DefaultJustForMeTargetDir="%~dp0" InstallAllUsers=0 %py35addlocal%
         )
     )
 )
