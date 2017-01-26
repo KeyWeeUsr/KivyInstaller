@@ -14,7 +14,8 @@ or regular users, but this file disappeared as the wheel came in. KivyInstaller
 is inspired by this `kivy.bat` file from old portable package with multiple new
 functions.
 
-Read the [docs](http://kivyinstaller.readthedocs.io/en/latest/) or watch a [video](https://youtu.be/ch_ILDBEaok) and find more features!
+Read the [docs](http://kivyinstaller.readthedocs.io/en/master/) or watch
+a [video](https://youtu.be/ch_ILDBEaok) and find more features!
 
 1. Create a folder for your Python and place `kivy.bat` inside.
 
