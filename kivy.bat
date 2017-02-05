@@ -1,5 +1,5 @@
 ::Author: KeyWeeUsr @ https://github.com/KeyWeeUsr
-::Version: 2.4
+::Version: 2.5
 ::Inspired by kivy.bat file for kivy1.8.0
 ::To reset file just delete "config.kivyinstaller"
 ::Bitsadmin is available since winXP SP2
@@ -20,7 +20,7 @@ set pyversion=0
 set gstreamer=0
 set master=1.9.2
 set installkivy=1
-set installerversion=2.4
+set installerversion=2.5
 set admin=1
 setlocal ENABLEDELAYEDEXPANSION
 ver | find "5.1" >nul && set xp=1
@@ -450,6 +450,9 @@ if %first%==0 (
     )
 ) else (
     python -m pip install "%~dp0whls\Kivy-%master%.dev0-%cpwhl%-none-%arch%.whl"
+)
+if !designer!==1 (
+    python -m pip install https://github.com/kivy/kivy-designer/zipball/master
 )
 del /q "%~dp0whls\Kivy-%master%.dev0-%cpwhl%-none-%arch%.whl"
 
