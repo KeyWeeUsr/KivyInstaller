@@ -24,12 +24,6 @@ environment:
   - PY: 27
     ARCH: 86
     MASTER: 0
-    ADMIN: 1
-    DESIGNER: 0
-    SHORTCUTS: 0
-  - PY: 27
-    ARCH: 86
-    MASTER: 0
     ADMIN: 0
     DESIGNER: 1
     SHORTCUTS: 0
@@ -55,12 +49,6 @@ environment:
   - PY: 27
     ARCH: 64
     MASTER: 0
-    ADMIN: 1
-    DESIGNER: 0
-    SHORTCUTS: 0
-  - PY: 27
-    ARCH: 64
-    MASTER: 0
     ADMIN: 0
     DESIGNER: 1
     SHORTCUTS: 0
@@ -79,10 +67,6 @@ environment:
     ARCH: 86
     MASTER: 1
     ADMIN: 0
-  - PY: 34
-    ARCH: 86
-    MASTER: 0
-    ADMIN: 1
 
   - PY: 34
     ARCH: 64
@@ -92,10 +76,6 @@ environment:
     ARCH: 64
     MASTER: 1
     ADMIN: 0
-  - PY: 34
-    ARCH: 64
-    MASTER: 0
-    ADMIN: 1
 
   - PY: 35
     ARCH: 86
