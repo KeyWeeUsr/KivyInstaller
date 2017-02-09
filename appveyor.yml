@@ -2,6 +2,11 @@ version: 1.0.{build}
 environment:
   AVRAW: https://raw.githubusercontent.com/appveyor/ci/master/scripts/
   AVFILE: enable-desktop.ps1
+  KVMASTER: 1.9.2
+  LATESTPY2: 2.7.13
+  LATESTPY34: 3.4.6
+  LATESTPY35: 3.5.3
+  LATESTPY36: 3.6.0
 
   matrix:
   - PY: 27
