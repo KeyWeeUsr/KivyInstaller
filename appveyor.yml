@@ -242,3 +242,67 @@ build_script:
 
     echo Py %PY%, arch %ARCH%, master %MASTER% admin %ADMIN%
     designer %DESIGNER%, shortcuts %SHORTCUTS%, cd %CD%
+
+    mkdir %cd%\kivy_python
+
+    copy %cd%\kivy.bat %cd%\kivy_python\kivy.bat
+
+    cd %cd%\kivy_python
+
+    set DEBUG=1
+
+    set choice_python=3
+
+    if "%PY%"=="27" (
+        set choice_python=2&& set py2=%LATESTPY2%
+    ) else if "%PY%"=="34" (
+        set py3=%LATESTPY34%
+    ) else if "%PY%"=="35" (
+        set py3=%LATESTPY35%
+    ) else if "%PY%"=="36" (
+        set py3=%LATESTPY36%
+    )
+
+    set choice_kivy=y
+
+    set choice_master=n
+
+    if "%MASTER%"=="1" (
+        set choice_master=y
+    )
+
+    set choice_privileges=n
+
+    if "%ADMIN%"=="1" (
+        set choice_privileges=y
+    )
+
+    set choice_dsgn=n
+
+    if "%DESIGNER%"=="1" (
+        set choice_dsgn=y
+    )
+
+    set choice_shrt=n
+
+    if "%SHORTCUTS%"=="1" (
+        set choice_shrt=y
+    )
+
+    set master=%KVMASTER%
+
+    set choice_ext=n
+
+    set choice_gst=n
+
+    REM set 'arch32' with pipe to silence other 'set /p'
+
+    if "%ARCH%"=="86" (
+        (echo y)|kivy
+    ) else if "%ARCH%"=="64" (
+        (echo n)|kivy
+    )
+
+    echo Installer config
+
+    type %cd%\config.kivyinstaller
