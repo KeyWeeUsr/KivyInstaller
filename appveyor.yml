@@ -1,0 +1,239 @@
+version: 1.0.{build}
+environment:
+  AVRAW: https://raw.githubusercontent.com/appveyor/ci/master/scripts/
+  AVFILE: enable-desktop.ps1
+
+  matrix:
+  - PY: 27
+    ARCH: 86
+    MASTER: 0
+    ADMIN: 0
+    DESIGNER: 0
+    SHORTCUTS: 0
+  - PY: 27
+    ARCH: 86
+    MASTER: 1
+    ADMIN: 0
+    DESIGNER: 0
+    SHORTCUTS: 0
+  - PY: 27
+    ARCH: 86
+    MASTER: 0
+    ADMIN: 1
+    DESIGNER: 0
+    SHORTCUTS: 0
+  - PY: 27
+    ARCH: 86
+    MASTER: 0
+    ADMIN: 0
+    DESIGNER: 1
+    SHORTCUTS: 0
+  - PY: 27
+    ARCH: 86
+    MASTER: 0
+    ADMIN: 0
+    DESIGNER: 0
+    SHORTCUTS: 1
+
+  - PY: 27
+    ARCH: 64
+    MASTER: 0
+    ADMIN: 0
+    DESIGNER: 0
+    SHORTCUTS: 0
+  - PY: 27
+    ARCH: 64
+    MASTER: 1
+    ADMIN: 0
+    DESIGNER: 0
+    SHORTCUTS: 0
+  - PY: 27
+    ARCH: 64
+    MASTER: 0
+    ADMIN: 1
+    DESIGNER: 0
+    SHORTCUTS: 0
+  - PY: 27
+    ARCH: 64
+    MASTER: 0
+    ADMIN: 0
+    DESIGNER: 1
+    SHORTCUTS: 0
+  - PY: 27
+    ARCH: 64
+    MASTER: 0
+    ADMIN: 0
+    DESIGNER: 0
+    SHORTCUTS: 1
+
+  - PY: 34
+    ARCH: 86
+    MASTER: 0
+    ADMIN: 0
+    DESIGNER: 0
+    SHORTCUTS: 0
+  - PY: 34
+    ARCH: 86
+    MASTER: 1
+    ADMIN: 0
+    DESIGNER: 0
+    SHORTCUTS: 0
+  - PY: 34
+    ARCH: 86
+    MASTER: 0
+    ADMIN: 1
+    DESIGNER: 0
+    SHORTCUTS: 0
+  - PY: 34
+    ARCH: 86
+    MASTER: 0
+    ADMIN: 0
+    DESIGNER: 1
+    SHORTCUTS: 0
+  - PY: 34
+    ARCH: 86
+    MASTER: 0
+    ADMIN: 0
+    DESIGNER: 0
+    SHORTCUTS: 1
+
+  - PY: 34
+    ARCH: 64
+    MASTER: 0
+    ADMIN: 0
+    DESIGNER: 0
+    SHORTCUTS: 0
+  - PY: 34
+    ARCH: 64
+    MASTER: 1
+    ADMIN: 0
+    DESIGNER: 0
+    SHORTCUTS: 0
+  - PY: 34
+    ARCH: 64
+    MASTER: 0
+    ADMIN: 1
+    DESIGNER: 0
+    SHORTCUTS: 0
+  - PY: 34
+    ARCH: 64
+    MASTER: 0
+    ADMIN: 0
+    DESIGNER: 1
+    SHORTCUTS: 0
+  - PY: 34
+    ARCH: 64
+    MASTER: 0
+    ADMIN: 0
+    DESIGNER: 0
+    SHORTCUTS: 1
+
+  - PY: 35
+    ARCH: 86
+    MASTER: 1
+    ADMIN: 0
+    DESIGNER: 0
+    SHORTCUTS: 0
+  - PY: 35
+    ARCH: 86
+    MASTER: 1
+    ADMIN: 1
+    DESIGNER: 0
+    SHORTCUTS: 0
+  - PY: 35
+    ARCH: 86
+    MASTER: 1
+    ADMIN: 0
+    DESIGNER: 1
+    SHORTCUTS: 0
+  - PY: 35
+    ARCH: 86
+    MASTER: 1
+    ADMIN: 0
+    DESIGNER: 0
+    SHORTCUTS: 1
+
+  - PY: 35
+    ARCH: 64
+    MASTER: 1
+    ADMIN: 0
+    DESIGNER: 0
+    SHORTCUTS: 0
+  - PY: 35
+    ARCH: 64
+    MASTER: 1
+    ADMIN: 1
+    DESIGNER: 0
+    SHORTCUTS: 0
+  - PY: 35
+    ARCH: 64
+    MASTER: 1
+    ADMIN: 0
+    DESIGNER: 1
+    SHORTCUTS: 0
+  - PY: 35
+    ARCH: 64
+    MASTER: 1
+    ADMIN: 0
+    DESIGNER: 0
+    SHORTCUTS: 1
+
+  - PY: 36
+    ARCH: 86
+    MASTER: 1
+    ADMIN: 0
+    DESIGNER: 0
+    SHORTCUTS: 0
+  - PY: 36
+    ARCH: 86
+    MASTER: 1
+    ADMIN: 1
+    DESIGNER: 0
+    SHORTCUTS: 0
+  - PY: 36
+    ARCH: 86
+    MASTER: 1
+    ADMIN: 0
+    DESIGNER: 1
+    SHORTCUTS: 0
+  - PY: 36
+    ARCH: 86
+    MASTER: 1
+    ADMIN: 0
+    DESIGNER: 0
+    SHORTCUTS: 1
+
+  - PY: 36
+    ARCH: 64
+    MASTER: 1
+    ADMIN: 0
+    DESIGNER: 0
+    SHORTCUTS: 0
+  - PY: 36
+    ARCH: 64
+    MASTER: 1
+    ADMIN: 1
+    DESIGNER: 0
+    SHORTCUTS: 0
+  - PY: 36
+    ARCH: 64
+    MASTER: 1
+    ADMIN: 0
+    DESIGNER: 1
+    SHORTCUTS: 0
+  - PY: 36
+    ARCH: 64
+    MASTER: 1
+    ADMIN: 0
+    DESIGNER: 0
+    SHORTCUTS: 1
+
+install:
+- ps: iex ((new-object net.webclient).DownloadString($env:AVRAW+$env:AVFILE))
+
+build_script:
+- cmd:
+    setlocal ENABLEDELAYEDEXPANSION
+
+    echo Py %PY%, arch %ARCH%, master %MASTER% admin %ADMIN%
+    designer %DESIGNER%, shortcuts %SHORTCUTS%, cd %CD%
