@@ -15,6 +15,12 @@ Installation
       installed there. ``git clone
       https://github.com/KeyWeeUsr/KivyInstaller``
 
+    - Or use command line instructions::
+
+       mkdir python
+       bitsadmin /transfer "GetBatch" "https://git.io/vDDjn" "%cd%\kivy.bat"
+       cd python
+
 #. Run ``kivy.bat`` and select your Python and Kivy versions.
 
     - To select y/n you have to type and press ``enter`` (``return``).
