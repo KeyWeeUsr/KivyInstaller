@@ -5,6 +5,8 @@ KivyInstaller
 
 <a href="http://kivyinstaller.readthedocs.io/en/master/" target="_blank">
 <img src="https://img.shields.io/badge/docs-master-brightgreen.svg" /></a>
+<a href="https://ci.appveyor.com/project/KeyWeeUsr/KivyInstaller" target="_blank">
+<img src="https://ci.appveyor.com/api/projects/status/bjusk0ueobr6d30x?svg=true" /></a>
 
 _It ships Kivy right to you!_
 
