@@ -183,6 +183,22 @@ build_script:
         (echo n)|kivy
     )
 
+    set QL=%appdata%\Microsoft\Internet Explorer\Quick Launch
+
+    set ST=%appdata%\Microsoft\Windows\SendTo
+
+    dir "%QL%"
+
+    if "%SHORTCUTS%"=="1" (
+        if not exist "%QL%\Kivy%PY%.bat" exit /B 1
+    )
+
+    dir "%ST%"
+
+    if "%SHORTCUTS%"=="1" (
+        if not exist "%ST%\Kivy%PY%.bat" exit /B 1
+    )
+
     echo Installer config
 
     type %cd%\config.kivyinstaller
