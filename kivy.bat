@@ -1,5 +1,5 @@
 ::Author: KeyWeeUsr @ https://github.com/KeyWeeUsr
-::Version: 2.5
+::Version: 2.6
 ::Inspired by kivy.bat file for kivy1.8.0
 ::To reset file just delete "config.kivyinstaller"
 ::Bitsadmin is available since winXP SP2
@@ -20,7 +20,7 @@ set pyversion=0
 set gstreamer=0
 set master=1.9.2
 set installkivy=1
-set installerversion=2.5
+set installerversion=2.6
 set admin=1
 setlocal ENABLEDELAYEDEXPANSION
 ver | find "5.1" >nul && set xp=1
@@ -405,6 +405,7 @@ if %gstreamer%==1 (
 ) else (
     python -m pip install %packages% %packurl%
 )
+python -m pip install -I https://kivy.org/downloads/appveyor/kivy/Kivy_examples-1.9.2.dev0-py2.py3-none-any.whl
 if %stable%==1 (
     python -m pip uninstall -y kivy
     python -m pip install kivy
@@ -419,9 +420,11 @@ echo.import os.path as op; import datetime as dt>> "%~dp0getnightly.py"
 echo.fid = {'cp27_win32':'Kivy-%master%.dev0-cp27-cp27m-win32.whl',>> "%~dp0getnightly.py"
 echo.       'cp34_win32':'Kivy-%master%.dev0-cp34-cp34m-win32.whl',>> "%~dp0getnightly.py"
 echo.       'cp35_win32':'Kivy-%master%.dev0-cp35-cp35m-win32.whl',>> "%~dp0getnightly.py"
+echo.       'cp36_win32':'Kivy-%master%.dev0-cp36-cp36m-win32.whl',>> "%~dp0getnightly.py"
 echo.       'cp27_win_amd64':'Kivy-%master%.dev0-cp27-cp27m-win_amd64.whl',>> "%~dp0getnightly.py"
 echo.       'cp34_win_amd64':'Kivy-%master%.dev0-cp34-cp34m-win_amd64.whl',>> "%~dp0getnightly.py"
-echo.       'cp35_win_amd64':'Kivy-%master%.dev0-cp35-cp35m-win_amd64.whl'}>> "%~dp0getnightly.py"
+echo.       'cp35_win_amd64':'Kivy-%master%.dev0-cp35-cp35m-win_amd64.whl',>> "%~dp0getnightly.py"
+echo.       'cp36_win_amd64':'Kivy-%master%.dev0-cp36-cp36m-win_amd64.whl'}>> "%~dp0getnightly.py"
 >>"%~dp0getnightly.py" echo.y = '{:%%d%%m%%Y}'.format(dt.datetime.now()-dt.timedelta(days=1))
 echo.file_id = fid['%cpwhl%_%arch%']>>"%~dp0getnightly.py"
 echo.file_name = 'Kivy-%master%.dev0_'+y+'-%cpwhl%-%cp%-%arch%.whl'>> "%~dp0getnightly.py"
@@ -567,7 +570,7 @@ exit
 :console
 echo.
 echo ###############################################################################
-@if not defined DEBUG_CONSOLE (echo off)
+@if not defined DEBUG (echo off)
 python -c "import sys; print('.'.join(str(x) for x in sys.version_info[:3]))" > temp.txt
 set /p python_version=<temp.txt
 del temp.txt
@@ -596,17 +599,34 @@ if not [%1]==[pack] (
     pause
     exit
 )
-for /f %%a in ("%2") do for %%b in ("%%~dpa\.") do set n=%%~nxb
-for /f %%a in ("%2") do for %%b in ("%%~dpa") do set d=%%b
+
+set sy=import sys
+set n_imp=from os.path import basename as b;%sy%
+
+for /f "delims=" %%A in (
+    'python -c "%n_imp%;print(b(sys.argv[1]))" %2'
+) do set "nn=%%A"
+
+for /f "delims=" %%A in (
+    'python -c "%sy%;print(sys.argv[1].replace('%nn%','').replace('\\', '\\\\'))" %2'
+) do set "d=%%A"
+
+for /f "delims=" %%A in (
+    'python -c "%sy%;print(sys.argv[1].replace('\\', '\\\\\\\\'))" "%d%"'
+) do set "dd=%%A"
+
+for /f "delims=" %%A in (
+    'python -c "from os.path import split;print(split('%d%'[:-1])[-1])" %2'
+) do set "n=%%A"
+
 echo Collecting data...
-python -m PyInstaller --debug --name "%n%" "%2"
+python -m PyInstaller --debug --name "%n%" "%d%%nn%"
+
 echo Editing .spec file...
-set d=%d:\=\\\\%
-set f=from kivy.deps import sdl2, glew\na = 
+set f=from kivy.deps import sdl2, glew\na =
 set t=a.datas,*[Tree(p) for p in (sdl2.dep_bins + glew.dep_bins)],
-:: %d:"=% strips double-quotes
-python -c "o=open;f=o('%n%.spec');t=f.read();f.close();f=o('%n%.spec','w');f.write(t.replace('\na = ','%f%').replace('a.datas,','%t%').replace('T(exe,','T(exe,Tree(\'%d:"=%\'),'));f.close();"
+python -c "o=open;f=o('%n%.spec');t=f.read();f.close();f=o('%n%.spec','w');f.write(t.replace('\na = ','%f%').replace('a.datas,','%t%').replace('T(exe,','T(exe,Tree(\'%dd%\'),'));f.close();"
+
 echo Packaging...
 python -m PyInstaller "%n%.spec"
-del /q "%~dp0%n%.spec"
 goto end
