@@ -18,7 +18,7 @@ Installation
     - Or use command line instructions::
 
        mkdir python
-       bitsadmin /transfer "GetBatch" "https://git.io/vDDjn" "%cd%\kivy.bat"
+       bitsadmin /transfer "GetBatch" "https://git.io/vDDjn" "%cd%\python\kivy.bat"
        cd python
 
 #. Run ``kivy.bat`` and select your Python and Kivy versions.

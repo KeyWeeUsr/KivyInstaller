@@ -23,7 +23,7 @@ a [video](https://youtu.be/ch_ILDBEaok) and find more features!
    You can do so directly from the command line with:
 
         mkdir python
-        bitsadmin /transfer "GetBatch" "https://git.io/vDDjn" "%cd%\kivy.bat"
+        bitsadmin /transfer "GetBatch" "https://git.io/vDDjn" "%cd%\python\kivy.bat"
         cd python
 
 2. Run `kivy.bat`, select your Python and Kivy versions, wait.
