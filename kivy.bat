@@ -1,5 +1,5 @@
 ::Author: KeyWeeUsr @ https://github.com/KeyWeeUsr
-::Version: 2.6
+::Version: 2.7
 ::Inspired by kivy.bat file for kivy1.8.0
 ::To reset file just delete "config.kivyinstaller"
 ::Bitsadmin is available since winXP SP2
@@ -20,7 +20,7 @@ set pyversion=0
 set gstreamer=0
 set master=1.9.2
 set installkivy=1
-set installerversion=2.6
+set installerversion=2.7
 set admin=1
 setlocal ENABLEDELAYEDEXPANSION
 ver | find "5.1" >nul && set xp=1
@@ -571,13 +571,12 @@ exit
 echo.
 echo ###############################################################################
 @if not defined DEBUG (echo off)
-python -c "import sys; print('.'.join(str(x) for x in sys.version_info[:3]))" > temp.txt
-set /p python_version=<temp.txt
-del temp.txt
-start "" /min /wait python.exe -c "import kivy;f=open('temp.txt','w');f.write(kivy.__version__);f.close()"
-set /p kivy_version=<temp.txt
-del temp.txt
-python -c "exec(\"try:\n    import os.path as o,glob,re,datetime,sys;    p=o.dirname(o.abspath(sys.executable));    m=re.findall('(\d{8})', o.basename(max(glob.glob(p+'/whls/*.[Ww][Hh][Ll]*'), key=o.getctime))[:-4])[0];    print(m[:2]+datetime.date(1900, int(m[2:4]), 1).strftime('%%B')[:3]+m[4:]);\nexcept:\n    pass\")">t
+python -c "import sys; print('.'.join(str(x) for x in sys.version_info[:3]))" > t
+set /p python_version=<t
+set kv_imp=import kivy;f=open('t','w');f.write(kivy
+start "" /min /wait python.exe -c "%kv_imp%.__version__);f.close()"
+set /p kivy_version=<t
+start "" /min /wait python.exe -c "%kv_imp%.__date__);f.close()"
 set /p wheel_version=<t
 del t
 echo - KivyInstaller: %installerversion%
