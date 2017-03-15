@@ -1,5 +1,5 @@
 ::Author: KeyWeeUsr @ https://github.com/KeyWeeUsr
-::Version: 2.7
+::Version: 2.8
 ::Inspired by kivy.bat file for kivy1.8.0
 ::To reset file just delete "config.kivyinstaller"
 ::Bitsadmin is available since winXP SP2
@@ -20,7 +20,7 @@ set pyversion=0
 set gstreamer=0
 set master=1.9.2
 set installkivy=1
-set installerversion=2.7
+set installerversion=2.8
 set admin=1
 setlocal ENABLEDELAYEDEXPANSION
 ver | find "5.1" >nul && set xp=1
@@ -543,8 +543,9 @@ if [%1]==[update] (
     start "" "https://kivy.org/docs/installation/installation-windows.html#use-development-kivy"
     goto end
 ) else if [%1]==[getmsvc] (
-    start "" "http://landinghub.visualstudio.com/visual-cpp-build-tools"
-    start "" "https://kivy.org/docs/installation/installation-windows.html#msvc"
+    bitsadmin.exe /transfer "GetVC++" "http://go.microsoft.com/fwlink/?LinkId=691126" "%~dp0visualcppbuildtools_full.exe"
+    start %cd%\visualcppbuildtools_full.exe
+    start "" "https://git.io/vyyhO"
     goto end
 ) else if [%1]==[help] (
     goto help
