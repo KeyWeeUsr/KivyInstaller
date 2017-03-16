@@ -174,8 +174,7 @@ if %arch%==win32 (
         if !pyext!==.msi (
             msiexec.exe /a "%~dp0py%pyversion%.msi" /qb /L*V "%~dp0msi.log" ^
             ALLUSERS=0 TARGETDIR="%~dp0kivy" CURRENTDIRECTORY="%~dp0" %addlocal%
-            for /f "tokens=*" %%f in ('dir /b "%~dp0kivy"') ^
-            do move "%~dp0kivy\%%f" "%~dp0%%f" >nul
+            for /f "tokens=*" %%f in ('dir /b "%~dp0kivy"') do move "%~dp0kivy\%%f" "%~dp0%%f" >nul
         ) else if !pyext!==.exe (
             "%~dp0py%pyversion%-webinstall.exe" /quiet /layout "%~dp0\_installers"
             msiexec.exe /a "%~dp0\_installers\core.msi" TARGETDIR="%~dp0"
@@ -237,8 +236,7 @@ if %arch%==win32 (
         if !pyext!==.msi (
             msiexec.exe /a "%~dp0py%pyversion%!amdext!.msi" /qb /L*V "%~dp0msi.log" ^
             ALLUSERS=0 TARGETDIR="%~dp0kivy" CURRENTDIRECTORY="%~dp0" %addlocal%
-            for /f "tokens=*" %%f in ('dir /b "%~dp0kivy"') ^
-            do move "%~dp0kivy\%%f" "%~dp0%%f" >nul
+            for /f "tokens=*" %%f in ('dir /b "%~dp0kivy"') do move "%~dp0kivy\%%f" "%~dp0%%f" >nul
         ) else if !pyext!==.exe (
             "%~dp0py%pyversion%!amdext!-webinstall.exe" /quiet /layout "%~dp0\_installers"
             msiexec.exe /a "%~dp0\_installers\core.msi" TARGETDIR="%~dp0"
