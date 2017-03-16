@@ -1,5 +1,5 @@
 ::Author: KeyWeeUsr @ https://github.com/KeyWeeUsr
-::Version: 2.8
+::Version: 2.9
 ::Inspired by kivy.bat file for kivy1.8.0
 ::To reset file just delete "config.kivyinstaller"
 ::Bitsadmin is available since winXP SP2
@@ -20,7 +20,7 @@ set pyversion=0
 set gstreamer=0
 set master=1.9.2
 set installkivy=1
-set installerversion=2.8
+set installerversion=2.9
 set admin=1
 setlocal ENABLEDELAYEDEXPANSION
 ver | find "5.1" >nul && set xp=1
@@ -29,6 +29,7 @@ set sendto=%appdata%\Microsoft\Windows\SendTo
 set taskbar=%appdata%\Microsoft\Internet Explorer\Quick Launch
 set addlocal=ADDLOCAL^=DefaultFeature,PrivateCRT,TclTk,Documentation,Tools,Testsuite
 set py35addlocal=Shortcuts=0 Include_launcher=0 Include_pip=0
+set pyFTP=https://www.python.org/ftp/python/
 if %xp%==1 (
     set sendto=%userprofile%\SendTo
 )
@@ -153,20 +154,28 @@ if %arch%==win32 (
         echo Downloading Python installer...
         if !pyext!==.exe (
             if %admin%==0 (
-                bitsadmin.exe /transfer "GetPython%pyversion%-webinstall!pyext!" "https://www.python.org/ftp/python/%pyversion%/python-%pyversion%-webinstall!pyext!" "%~dp0py%pyversion%-webinstall!pyext!"
+                bitsadmin.exe /transfer "GetPython%pyversion%-webinstall!pyext!" ^
+                "%pyFTP%%pyversion%/python-%pyversion%-webinstall!pyext!" ^
+                "%~dp0py%pyversion%-webinstall!pyext!"
             ) else (
-                bitsadmin.exe /transfer "GetPython%pyversion%!pyext!" "https://www.python.org/ftp/python/%pyversion%/python-%pyversion%!pyext!" "%~dp0py%pyversion%!pyext!"
+                bitsadmin.exe /transfer "GetPython%pyversion%!pyext!" ^
+                "%pyFTP%%pyversion%/python-%pyversion%!pyext!" ^
+                "%~dp0py%pyversion%!pyext!"
             )
         ) else (
-            bitsadmin.exe /transfer "GetPython%pyversion%!pyext!" "https://www.python.org/ftp/python/%pyversion%/python-%pyversion%!pyext!" "%~dp0py%pyversion%!pyext!"
+            bitsadmin.exe /transfer "GetPython%pyversion%!pyext!" ^
+            "%pyFTP%%pyversion%/python-%pyversion%!pyext!" ^
+            "%~dp0py%pyversion%!pyext!"
         )
         echo Installing...
     )
     if %admin%==0 (
         copy "%~dp0py%pyversion%!pyext!" "%~dp0py%pyversion%_!pyext!" >nul
         if !pyext!==.msi (
-            msiexec.exe /a "%~dp0py%pyversion%.msi" /qb /L*V "%~dp0msi.log" ALLUSERS=0 TARGETDIR="%~dp0kivy" CURRENTDIRECTORY="%~dp0" %addlocal%
-            for /f "tokens=*" %%f in ('dir /b "%~dp0kivy"') do move "%~dp0kivy\%%f" "%~dp0%%f" >nul
+            msiexec.exe /a "%~dp0py%pyversion%.msi" /qb /L*V "%~dp0msi.log" ^
+            ALLUSERS=0 TARGETDIR="%~dp0kivy" CURRENTDIRECTORY="%~dp0" %addlocal%
+            for /f "tokens=*" %%f in ('dir /b "%~dp0kivy"') ^
+            do move "%~dp0kivy\%%f" "%~dp0%%f" >nul
         ) else if !pyext!==.exe (
             "%~dp0py%pyversion%-webinstall.exe" /quiet /layout "%~dp0\_installers"
             msiexec.exe /a "%~dp0\_installers\core.msi" TARGETDIR="%~dp0"
@@ -189,9 +198,11 @@ if %arch%==win32 (
         )
     ) else (
         if !pyext!==.msi (
-            msiexec.exe /i "%~dp0py%pyversion%.msi" /qb /L*V "%~dp0msi.log" ALLUSERS=0 TARGETDIR="%~dp0" CURRENTDIRECTORY="%~dp0" %addlocal%
+            msiexec.exe /i "%~dp0py%pyversion%.msi" /qb /L*V "%~dp0msi.log" ^
+            ALLUSERS=0 TARGETDIR="%~dp0" CURRENTDIRECTORY="%~dp0" %addlocal%
         ) else if !pyext!==.exe (
-            "%~dp0py%pyversion%.exe" /quiet /log "%~dp0msi.log" DefaultJustForMeTargetDir="%~dp0" InstallAllUsers=0 %py35addlocal%
+            "%~dp0py%pyversion%.exe" /quiet /log "%~dp0msi.log" ^
+            DefaultJustForMeTargetDir="%~dp0" InstallAllUsers=0 %py35addlocal%
         )
     )
 ) else (
@@ -204,20 +215,30 @@ if %arch%==win32 (
     ) else (
         if !pyext!==.exe (
             if %admin%==0 (
-                bitsadmin.exe /transfer "GetPython%pyversion%!amdext!-webinstall!pyext!" "https://www.python.org/ftp/python/%pyversion%/python-%pyversion%!amdext!-webinstall!pyext!" "%~dp0py%pyversion%!amdext!-webinstall!pyext!"
+                bitsadmin.exe /transfer ^
+                "GetPython%pyversion%!amdext!-webinstall!pyext!" ^
+                "%pyFTP%%pyversion%/python-%pyversion%!amdext!-webinstall!pyext!" ^
+                "%~dp0py%pyversion%!amdext!-webinstall!pyext!"
             ) else (
-                bitsadmin.exe /transfer "GetPython%pyversion%!amdext!!pyext!" "https://www.python.org/ftp/python/%pyversion%/python-%pyversion%!amdext!!pyext!" "%~dp0py%pyversion%!amdext!!pyext!"
+                bitsadmin.exe /transfer ^
+                "GetPython%pyversion%!amdext!!pyext!" ^
+                "%pyFTP%%pyversion%/python-%pyversion%!amdext!!pyext!" ^
+                "%~dp0py%pyversion%!amdext!!pyext!"
             )
         ) else (
-            bitsadmin.exe /transfer "GetPython%pyversion%!amdext!!pyext!" "https://www.python.org/ftp/python/%pyversion%/python-%pyversion%!amdext!!pyext!" "%~dp0py%pyversion%!amdext!!pyext!"
+            bitsadmin.exe /transfer "GetPython%pyversion%!amdext!!pyext!" ^
+            "%pyFTP%%pyversion%/python-%pyversion%!amdext!!pyext!" ^
+            "%~dp0py%pyversion%!amdext!!pyext!"
         )
         echo Installing...
     )
     if %admin%==0 (
         copy "%~dp0py%pyversion%!amdext!.msi" "%~dp0py%pyversion%_!amdext!.msi" >nul
         if !pyext!==.msi (
-            msiexec.exe /a "%~dp0py%pyversion%!amdext!.msi" /qb /L*V "%~dp0msi.log" ALLUSERS=0 TARGETDIR="%~dp0kivy" CURRENTDIRECTORY="%~dp0" %addlocal%
-            for /f "tokens=*" %%f in ('dir /b "%~dp0kivy"') do move "%~dp0kivy\%%f" "%~dp0%%f" >nul
+            msiexec.exe /a "%~dp0py%pyversion%!amdext!.msi" /qb /L*V "%~dp0msi.log" ^
+            ALLUSERS=0 TARGETDIR="%~dp0kivy" CURRENTDIRECTORY="%~dp0" %addlocal%
+            for /f "tokens=*" %%f in ('dir /b "%~dp0kivy"') ^
+            do move "%~dp0kivy\%%f" "%~dp0%%f" >nul
         ) else if !pyext!==.exe (
             "%~dp0py%pyversion%!amdext!-webinstall.exe" /quiet /layout "%~dp0\_installers"
             msiexec.exe /a "%~dp0\_installers\core.msi" TARGETDIR="%~dp0"
@@ -240,9 +261,11 @@ if %arch%==win32 (
         )
     ) else (
         if !pyext!==.msi (
-            msiexec.exe /i "%~dp0py%pyversion%!amdext!.msi" /qb /L*V "%~dp0msi.log" ALLUSERS=0 TARGETDIR="%~dp0" CURRENTDIRECTORY="%~dp0" %addlocal%
+            msiexec.exe /i "%~dp0py%pyversion%!amdext!.msi" /qb /L*V "%~dp0msi.log" ^
+            ALLUSERS=0 TARGETDIR="%~dp0" CURRENTDIRECTORY="%~dp0" %addlocal%
         ) else if !pyext!==.exe (
-            "%~dp0py%pyversion%!amdext!.exe" /quiet /log "%~dp0msi.log" DefaultJustForMeTargetDir="%~dp0" InstallAllUsers=0 %py35addlocal%
+            "%~dp0py%pyversion%!amdext!.exe" /quiet /log "%~dp0msi.log" ^
+            DefaultJustForMeTargetDir="%~dp0" InstallAllUsers=0 %py35addlocal%
         )
     )
 )
@@ -264,7 +287,9 @@ if %arch%==win32 (
         set amdext=-amd64
     )
     if not exist "%~dp0py%pyversion%!pyext!" (
-        bitsadmin.exe /transfer "GetPython%pyversion%!pyext!" "https://www.python.org/ftp/python/%pyversion%/python-%pyversion%!pyext!" "%~dp0py%pyversion%!pyext!"
+        bitsadmin.exe /transfer "GetPython%pyversion%!pyext!" ^
+        "%pyFTP%%pyversion%/python-%pyversion%!pyext!" ^
+        "%~dp0py%pyversion%!pyext!"
     )
     if %choice_uninstall%==y (
         if %admin%==0 (
@@ -281,7 +306,9 @@ if %arch%==win32 (
     ) else (goto end)
 ) else (
     if not exist "%~dp0py%pyversion%%amdext%!pyext!" (
-        bitsadmin.exe /transfer "GetPython%pyversion%%amdext%!pyext!" "https://www.python.org/ftp/python/%pyversion%/python-%pyversion%%amdext%!pyext!" "%~dp0py%pyversion%%amdext%!pyext!"
+        bitsadmin.exe /transfer "GetPython%pyversion%%amdext%!pyext!" ^
+        "%pyFTP%%pyversion%/python-%pyversion%%amdext%!pyext!" ^
+        "%~dp0py%pyversion%%amdext%!pyext!"
     )
     if %choice_uninstall%==y (
         if %admin%==0 (
@@ -324,10 +351,16 @@ if %choice_dist%==y (
 goto rmshortcuts
 
 :batupdate
+:: Download GitHub's raw output
 echo Checking for updates...
-bitsadmin.exe /transfer "GetKivyInstaller" "https://raw.githubusercontent.com/KeyWeeUsr/KivyInstaller/master/kivy.bat" "%~dp0_update_kivy.bat"
+bitsadmin.exe /transfer "GetKivyInstaller" "https://git.io/vDDjn" "%~dp0_update_kivy.bat"
+
+:: UNIX to WIN EOL (GitHub raw provides \n) with MORE /P
 type "%~dp0_update_kivy.bat" | more /p > "%~dp0update_kivy.bat"
 del "%~dp0_update_kivy.bat"
+
+:: Find the installer's version - fixed to the 2nd line
+:: -> strip "::Version: "(11)
 set /a line=0
 for /f "delims=" %%l in ('type "%~dp0update_kivy.bat"') do (
     set /a line=line+1
@@ -336,6 +369,7 @@ for /f "delims=" %%l in ('type "%~dp0update_kivy.bat"') do (
         set updateversion=!updateversion:~11!
     )
 )
+
 if %installerversion% lss %updateversion% (
     echo You are using KivyInstaller version %installerversion%!
     echo New version %updateversion% is available!
@@ -349,11 +383,14 @@ if %installerversion% lss %updateversion% (
     del "%~dp0update_kivy.bat"
     goto console
 )
-echo Backing up original file...
+
+:: echo F for file
+:: After update an exit is needed, otherwise a cached file is used!
+echo Backing up the original file...
 echo F | xcopy /y "%~dp0%~n0.bat" "%~dp0backup_kivy.bat"
 echo Updating...
-start cmd /c timeout /t 5 & (echo Y | xcopy "%~dp0update_kivy.bat" "%~dp0%~n0.bat") & del "%~dp0update_kivy.bat"
-exit
+(echo Y | xcopy "%~dp0update_kivy.bat" "%~dp0%~n0.bat") ^
+& del "%~dp0update_kivy.bat" & echo Done & exit
 
 :help
 echo.
@@ -399,7 +436,8 @@ if %installkivy%==0 (
 echo Preparing Python for Kivy...
 python -m pip install --upgrade pip wheel setuptools
 set packurl=--extra-index-url https://kivy.org/downloads/packages/simple/
-set packages=docutils pygments pypiwin32 requests wget kivy.deps.sdl2 kivy.deps.glew pyinstaller
+set packages=docutils pygments pypiwin32 requests wget kivy.deps.sdl2 kivy.deps.glew ^
+pyinstaller
 if %gstreamer%==1 (
     python -m pip install %packages% kivy.deps.gstreamer %packurl%
 ) else (
