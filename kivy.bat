@@ -1,5 +1,5 @@
 ::Author: KeyWeeUsr @ https://github.com/KeyWeeUsr
-::Version: 2.9
+::Version: 3.0
 ::Inspired by kivy.bat file for kivy1.8.0
 ::To reset file just delete "config.kivyinstaller"
 ::Bitsadmin is available since winXP SP2
@@ -20,16 +20,23 @@ set pyversion=0
 set gstreamer=0
 set master=1.9.2
 set installkivy=1
-set installerversion=2.9
+set installerversion=3.0
 set admin=1
 setlocal ENABLEDELAYEDEXPANSION
-ver | find "5.1" >nul && set xp=1
 title = KivyInstaller %installerversion%
 set sendto=%appdata%\Microsoft\Windows\SendTo
 set taskbar=%appdata%\Microsoft\Internet Explorer\Quick Launch
 set addlocal=ADDLOCAL^=DefaultFeature,PrivateCRT,TclTk,Documentation,Tools,Testsuite
 set py35addlocal=Shortcuts=0 Include_launcher=0 Include_pip=0
 set pyFTP=https://www.python.org/ftp/python/
+
+:: Return version without installation
+if [%1]==[version] (
+    echo %installerversion%
+    exit
+)
+
+ver | find "5.1" >nul && set xp=1
 if %xp%==1 (
     set sendto=%userprofile%\SendTo
 )
@@ -407,6 +414,7 @@ echo   uninstall               Uninstall kivy, python and leave only %~n0.bat.
 echo   mkshortcuts             Create shortcuts for SendTo and TaskBar.
 echo   rmshortcuts             Remove shortcuts for SendTo and TaskBar.
 echo   pack "<path to .py>"    Quick packaging with pyinstaller.
+echo   version                 Prints version of the KivyInstaller.
 echo   help                    Show this.
 echo.
 echo Optional:
