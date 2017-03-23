@@ -22,9 +22,9 @@ a [video](https://youtu.be/ch_ILDBEaok) and find more features!
 1. Create a folder for your Python and place `kivy.bat` inside.
    You can do so directly from the command line with:
 
-        mkdir python
-        bitsadmin /transfer "GetBatch" "https://git.io/vDDjn" "%cd%\python\kivy.bat"
-        cd python
+       mkdir python
+       bitsadmin /transfer "GetBatch" "https://git.io/vDDjn" "%cd%\python\kivy.bat"
+       cd python
 
 2. Run `kivy.bat`, select your Python and Kivy versions, wait.
 
