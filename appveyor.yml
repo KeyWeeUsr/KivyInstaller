@@ -120,6 +120,12 @@ build_script:
 - cmd:
     setlocal ENABLEDELAYEDEXPANSION
 
+    rem Check vars for environment generation first
+
+    if not defined PY (echo Set env var "PY" to -> 27, 34, 35, 36, 37 & exit 1)
+
+    if not defined ARCH (echo Set env var "ARCH" to -> 86, 64 & exit 1)
+
     echo Py %PY%, arch %ARCH%, master %MASTER% admin %ADMIN%
     designer %DESIGNER%, shortcuts %SHORTCUTS%, cd %CD%
 
@@ -128,6 +134,38 @@ build_script:
     copy %cd%\kivy.bat %cd%\kivy_python\kivy.bat
 
     cd %cd%\kivy_python
+
+    rem batupdate test
+
+    kivy version > _ver
+
+    set /p new_ver=<_ver && del _ver
+
+    set up_com=::Version
+
+    rem just because appveyor is nuts about single colons
+
+    powershell -c "[char]58" > _colon
+
+    set /p colon=<_colon && del _colon
+
+    set up_com=%up_com%%colon% %new_ver%
+
+    set up_ver=set installerversion=%new_ver%
+
+    powershell -c "[string](%new_ver%-0.1)" > _calc
+
+    set /p old_ver=<_calc && del _calc
+
+    for /F "delims=" %%l in (%cd%\kivy.bat) do (if "%%l"=="%up_com%" (
+        echo ::Version%colon% %old_ver%>> old.bat
+    ) else if "%%l"=="%up_ver%" (
+        echo set installerversion=%old_ver%>> old.bat
+    ) else (echo %%l>> old.bat))
+
+    del %cd%\kivy.bat && move %cd%\old.bat %cd%\kivy.bat
+
+    rem batch test
 
     set DEBUG=1
 
@@ -202,3 +240,11 @@ build_script:
     echo Installer config
 
     type %cd%\config.kivyinstaller
+
+    kivy batupdate
+
+    kivy version > _ver
+
+    set /p new_ver=<_ver && del _ver
+
+    if not %new_ver% gtr %old_ver% ( exit 1 )
