@@ -120,7 +120,9 @@ build_script:
 - cmd:
     setlocal ENABLEDELAYEDEXPANSION
 
-    rem Check vars for environment generation first
+    REM ***********************************************************************
+    REM Check vars for environment generation first, raise error if not def.  *
+    REM ***********************************************************************
 
     if not defined PY (echo Set env var "PY" to -> 27, 34, 35, 36, 37 & exit 1)
 
@@ -129,33 +131,33 @@ build_script:
     echo Py %PY%, arch %ARCH%, master %MASTER% admin %ADMIN%
     designer %DESIGNER%, shortcuts %SHORTCUTS%, cd %CD%
 
-    mkdir %cd%\kivy_python
-
-    copy %cd%\kivy.bat %cd%\kivy_python\kivy.bat
-
-    cd %cd%\kivy_python
-
-    rem batupdate test
+    REM ***********************************************************************
+    REM Downgrade versions in kivy.bat manually for batupdate test later.     *
+    REM                                                                       *
+    REM Appveyor/Yaml file raises errors when a single colon (:) or two       *
+    REM colons with a space are present in the file, thus EXIT as its env var *
+    REM %=ExitCodeAscii% converts the int to char.                            *
+    REM                                                                       *
+    REM Batch knows no float math, therefore VBS (or PS) needs to be used,    *
+    REM however, it may return a comma (,) instead of a period (.) in the     *
+    REM result, thus convert'n'replace behavior is unfortunately necessary.   *
+    REM ***********************************************************************
 
     kivy version > _ver
 
-    set /p new_ver=<_ver && del _ver
+    set /p new_ver=<_ver && del _ver && set up_com=::Version
 
-    set up_com=::Version
+    cmd /c exit 58 & call echo %=ExitCodeAscii% > _colon
 
-    rem just because appveyor is nuts about single colons
-
-    powershell -c "[char]58" > _colon
-
-    set /p colon=<_colon && del _colon
-
-    set up_com=%up_com%%colon% %new_ver%
+    set /p colon=<_colon & del _colon && set up_com=%up_com%%colon% %new_ver%
 
     set up_ver=set installerversion=%new_ver%
 
-    powershell -c "[string](%new_ver%-0.1)" > _calc
+    echo Wscript.Echo Replace(CStr(%new_ver%-0.1), ",", ".") > _calc.vbs
 
-    set /p old_ver=<_calc && del _calc
+    cscript //Nologo _calc.vbs > _calc
+
+    set /p old_ver=<_calc && del _calc && del _calc.vbs
 
     for /F "delims=" %%l in (%cd%\kivy.bat) do (if "%%l"=="%up_com%" (
         echo ::Version%colon% %old_ver%>> old.bat
@@ -165,11 +167,12 @@ build_script:
 
     del %cd%\kivy.bat && move %cd%\old.bat %cd%\kivy.bat
 
-    rem batch test
+    REM ***********************************************************************
+    REM Enable ECHO with DEBUG option.                                        *
+    REM Set options from the env vars provided in matrix + default fallback.  *
+    REM ***********************************************************************
 
-    set DEBUG=1
-
-    set choice_python=3
+    set DEBUG=1 && set choice_python=3
 
     if "%PY%"=="27" (
         set choice_python=2&& set py2=%LATESTPY2%
@@ -181,9 +184,7 @@ build_script:
         set py3=%LATESTPY36%
     )
 
-    set choice_kivy=y
-
-    set choice_master=n
+    set choice_kivy=y && set choice_master=n
 
     if "%MASTER%"=="1" (
         set choice_master=y
@@ -207,19 +208,26 @@ build_script:
         set choice_shrt=y
     )
 
-    set master=%KVMASTER%
+    set master=%KVMASTER% && set choice_ext=n && set choice_gst=n
 
-    set choice_ext=n
-
-    set choice_gst=n
-
-    REM set 'arch32' with pipe to silence other 'set /p'
+    REM ***********************************************************************
+    REM ARCH option is the first asked option, therefore it needs a user      *
+    REM interaction - handled by ECHOing through PIPE. The rest of "set /p"   *
+    REM options are silenced by this step + variables are set before ECHO.    *
+    REM                                                                       *
+    REM The ECHO runs the kivy.bat script that doesn't need any form of user  *
+    REM interaction + DEBUG in the env forbids running the Touchtracer.       *
+    REM ***********************************************************************
 
     if "%ARCH%"=="86" (
         (echo y)|kivy
     ) else if "%ARCH%"=="64" (
         (echo n)|kivy
     )
+
+    REM ***********************************************************************
+    REM Check kivy.bat launcher in Quick Launch and SendTo folders + print.   *
+    REM ***********************************************************************
 
     set QL=%appdata%\Microsoft\Internet Explorer\Quick Launch
 
@@ -237,14 +245,20 @@ build_script:
         if not exist "%ST%\Kivy%PY%.bat" exit /B 1
     )
 
+    REM ***********************************************************************
+    REM Output the configuration for script (for manual check if neccessary). *
+    REM ***********************************************************************
+
     echo Installer config
 
     type %cd%\config.kivyinstaller
 
+    REM ***********************************************************************
+    REM Test script update command via script variable check.                 *
+    REM ***********************************************************************
+
     kivy batupdate
 
-    kivy version > _ver
-
-    set /p new_ver=<_ver && del _ver
+    kivy version > _ver && set /p new_ver=<_ver && del _ver
 
     if not %new_ver% gtr %old_ver% ( exit 1 )
