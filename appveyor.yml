@@ -153,7 +153,7 @@ build_script:
 
     set up_ver=set installerversion=%new_ver%
 
-    echo Wscript.Echo Replace(CStr(%new_ver%-0.1), ",", ".") > _calc.vbs
+    echo Wscript.Echo Replace(CStr(FormatNumber(%new_ver%-0.1, 1)), ",", ".") > _calc.vbs
 
     cscript //Nologo _calc.vbs > _calc
 
