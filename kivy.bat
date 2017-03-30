@@ -1,5 +1,5 @@
 ::Author: KeyWeeUsr @ https://github.com/KeyWeeUsr
-::Version: 3.1
+::Version: 3.2
 ::Inspired by kivy.bat file for kivy1.8.0
 ::To reset file just delete "config.kivyinstaller"
 ::Bitsadmin is available since winXP SP2
@@ -20,7 +20,7 @@ set pyversion=0
 set gstreamer=0
 set master=1.9.2
 set installkivy=1
-set installerversion=3.1
+set installerversion=3.2
 set admin=1
 setlocal ENABLEDELAYEDEXPANSION
 title = KivyInstaller %installerversion%
@@ -34,6 +34,13 @@ set pyFTP=https://www.python.org/ftp/python/
 if [%1]==[version] (
     echo %installerversion%
     exit
+)
+
+:: Set downloader
+if [%SHELL%]==[/bin/bash] (
+    set down=kiwget.exe
+) else (
+    set down=bitsadmin.exe
 )
 
 ver | find "5.1" >nul && set xp=1
@@ -161,16 +168,16 @@ if %arch%==win32 (
         echo Downloading Python installer...
         if !pyext!==.exe (
             if %admin%==0 (
-                bitsadmin.exe /transfer "GetPython%pyversion%-webinstall!pyext!" ^
+                %down% /transfer "GetPython%pyversion%-webinstall!pyext!" ^
                 "%pyFTP%%pyversion%/python-%pyversion%-webinstall!pyext!" ^
                 "%~dp0py%pyversion%-webinstall!pyext!"
             ) else (
-                bitsadmin.exe /transfer "GetPython%pyversion%!pyext!" ^
+                %down% /transfer "GetPython%pyversion%!pyext!" ^
                 "%pyFTP%%pyversion%/python-%pyversion%!pyext!" ^
                 "%~dp0py%pyversion%!pyext!"
             )
         ) else (
-            bitsadmin.exe /transfer "GetPython%pyversion%!pyext!" ^
+            %down% /transfer "GetPython%pyversion%!pyext!" ^
             "%pyFTP%%pyversion%/python-%pyversion%!pyext!" ^
             "%~dp0py%pyversion%!pyext!"
         )
@@ -221,18 +228,18 @@ if %arch%==win32 (
     ) else (
         if !pyext!==.exe (
             if %admin%==0 (
-                bitsadmin.exe /transfer ^
+                %down% /transfer ^
                 "GetPython%pyversion%!amdext!-webinstall!pyext!" ^
                 "%pyFTP%%pyversion%/python-%pyversion%!amdext!-webinstall!pyext!" ^
                 "%~dp0py%pyversion%!amdext!-webinstall!pyext!"
             ) else (
-                bitsadmin.exe /transfer ^
+                %down% /transfer ^
                 "GetPython%pyversion%!amdext!!pyext!" ^
                 "%pyFTP%%pyversion%/python-%pyversion%!amdext!!pyext!" ^
                 "%~dp0py%pyversion%!amdext!!pyext!"
             )
         ) else (
-            bitsadmin.exe /transfer "GetPython%pyversion%!amdext!!pyext!" ^
+            %down% /transfer "GetPython%pyversion%!amdext!!pyext!" ^
             "%pyFTP%%pyversion%/python-%pyversion%!amdext!!pyext!" ^
             "%~dp0py%pyversion%!amdext!!pyext!"
         )
@@ -292,7 +299,7 @@ if %arch%==win32 (
         set amdext=-amd64
     )
     if not exist "%~dp0py%pyversion%!pyext!" (
-        bitsadmin.exe /transfer "GetPython%pyversion%!pyext!" ^
+        %down% /transfer "GetPython%pyversion%!pyext!" ^
         "%pyFTP%%pyversion%/python-%pyversion%!pyext!" ^
         "%~dp0py%pyversion%!pyext!"
     )
@@ -311,7 +318,7 @@ if %arch%==win32 (
     ) else (goto end)
 ) else (
     if not exist "%~dp0py%pyversion%%amdext%!pyext!" (
-        bitsadmin.exe /transfer "GetPython%pyversion%%amdext%!pyext!" ^
+        %down% /transfer "GetPython%pyversion%%amdext%!pyext!" ^
         "%pyFTP%%pyversion%/python-%pyversion%%amdext%!pyext!" ^
         "%~dp0py%pyversion%%amdext%!pyext!"
     )
@@ -358,7 +365,7 @@ goto rmshortcuts
 :batupdate
 :: Download GitHub's raw output
 echo Checking for updates...
-bitsadmin.exe /transfer "GetKivyInstaller" "https://git.io/vDDjn" "%~dp0_update_kivy.bat"
+%down% /transfer "GetKivyInstaller" "https://git.io/vDDjn" "%~dp0_update_kivy.bat"
 
 :: UNIX to WIN EOL (GitHub raw provides \n) with MORE /P
 type "%~dp0_update_kivy.bat" | more /p > "%~dp0update_kivy.bat"
@@ -590,7 +597,7 @@ if [%1]==[update] (
     start "" "https://kivy.org/docs/installation/installation-windows.html#use-development-kivy"
     goto end
 ) else if [%1]==[getmsvc] (
-    bitsadmin.exe /transfer "GetVC++" "http://go.microsoft.com/fwlink/?LinkId=691126" "%~dp0visualcppbuildtools_full.exe"
+    %down% /transfer "GetVC++" "http://go.microsoft.com/fwlink/?LinkId=691126" "%~dp0visualcppbuildtools_full.exe"
     start %cd%\visualcppbuildtools_full.exe
     start "" "https://git.io/vyyhO"
     goto end
