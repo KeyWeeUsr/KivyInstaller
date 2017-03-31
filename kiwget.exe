@@ -1,0 +1,6 @@
+#!/bin/bash
+[ "$1" = "kivy" ] && wget -q -O kivy.bat https://git.io/vDDjn
+if [ "$1" = "/transfer" ]; then
+    wget -q -O $4 $3
+fi
+exit
