@@ -22,6 +22,7 @@ set master=1.9.2
 set installkivy=1
 set installerversion=3.2
 set admin=1
+set kilog=[KivyInstaller]
 setlocal ENABLEDELAYEDEXPANSION
 title = KivyInstaller %installerversion%
 set sendto=%appdata%\Microsoft\Windows\SendTo
@@ -55,13 +56,13 @@ echo.
 echo Report issues @ https://github.com/KeyWeeUsr/KivyInstaller/issues
 echo ###############################################################################
 
-echo Looking for config file...
+echo %kilog% Looking for config file...
 if exist "%~dp0config.kivyinstaller" (
-    echo Config found, setting variables...
+    echo %kilog% Config file found, setting variables...
     set first=0
     for /f "delims=" %%z in ('type "%~dp0config.kivyinstaller"') do set %%z
 ) else (
-    echo Config not found, running installation...
+    echo %kilog% Config file not found, running installation...
     set first=1
 )
 
@@ -75,15 +76,15 @@ if not %first%==1 (
     goto installed
 )
 if %processor_architecture%==AMD64 (
-    set /p arch32="64bit detected, use 32bit instead? y/n"
+    set /p arch32="64bit environment detected! Create 32bit instead? y/n"
     if !arch32!==n (
         set arch=win_amd64
     )
 )
 if exist "%~dp0python.exe" (
-    echo Python is already installed!
-    echo To continue with kivy installation choose "y"
-    echo To uninstall choose "n"
+    echo %kilog% Python is already installed!
+    echo %kilog% - To continue with kivy installation choose "y"
+    echo %kilog% - To uninstall choose "n"
     set /p kivycontinue="Continue with kivy installation? y/n"
     if !kivycontinue!==n (
         goto uninstall
@@ -91,7 +92,7 @@ if exist "%~dp0python.exe" (
 )
 
 :privileges
-set /p choice_privileges="Admin privileges? y/n"
+set /p choice_privileges="Install Python globally (requires admin)? y/n"
 if %choice_privileges%==y (
     goto version
 ) else if %choice_privileges%==n (
@@ -101,7 +102,7 @@ if %choice_privileges%==y (
 )
 
 :version
-set /p choice_python="Python version? 2/3"
+set /p choice_python="Choose the Python version! 2/3"
 if %choice_python%==2 (
     set pyversion=%py2%
     set cp=%cp2%m
@@ -118,7 +119,7 @@ if %choice_python%==2 (
 )
 
 :extensions
-set /p choice_ext="Register python extensions (.py, .pyc, ...)? y/n"
+set /p choice_ext="Register Python extensions (.py, .pyc, ...)? y/n"
 if %choice_ext%==y (
     set addlocal=%addlocal%,Extensions
     set py35addlocal=%py35addlocal% AssociateFiles=1
@@ -130,7 +131,7 @@ if %choice_ext%==y (
 )
 
 :kivy
-set /p choice_kivy="Install Kivy? y/n"
+set /p choice_kivy="Proceed with Kivy installation? y/n"
 if %choice_kivy%==y (
     set installkivy=1
 ) else if %choice_kivy%==n (
@@ -139,11 +140,11 @@ if %choice_kivy%==y (
 ) else (
     goto kivy
 )
-set /p choice_master="Install kivy-master? y/n"
+set /p choice_master="Install the latest development version? y/n"
 if %choice_master%==y (
     set stable=0
 )
-set /p choice_gst="Install gstreamer? y/n"
+set /p choice_gst="Install GStreamer? y/n"
 if %choice_gst%==y (
     set gstreamer=1
 )
@@ -152,7 +153,7 @@ if %choice_dsgn%==y (
     set designer=1
 )
 
-set /p choice_shrt="Make shortcuts? y/n"
+set /p choice_shrt="Make shortcuts (taskbar + send to)? y/n"
 if %choice_shrt%==y (
     set shortcuts=1
 )
@@ -163,9 +164,9 @@ if !kivycontinue!==y (
 )
 if %arch%==win32 (
     if exist "%~dp0py%pyversion%!pyext!" (
-        echo Installer is already downloaded!
+        echo %kilog% Installer is already downloaded!
     ) else (
-        echo Downloading Python installer...
+        echo %kilog% Downloading Python installer...
         if !pyext!==.exe (
             if %admin%==0 (
                 %down% /transfer "GetPython%pyversion%-webinstall!pyext!" ^
@@ -181,7 +182,7 @@ if %arch%==win32 (
             "%pyFTP%%pyversion%/python-%pyversion%!pyext!" ^
             "%~dp0py%pyversion%!pyext!"
         )
-        echo Installing...
+        echo %kilog% Installing...
     )
     if %admin%==0 (
         copy "%~dp0py%pyversion%!pyext!" "%~dp0py%pyversion%_!pyext!" >nul
@@ -224,7 +225,7 @@ if %arch%==win32 (
         set amdext=-amd64
     )
     if exist "%~dp0py%pyversion%!amdext!!pyext!" (
-        echo Installer is already downloaded!
+        echo %kilog% Installer is already downloaded!
     ) else (
         if !pyext!==.exe (
             if %admin%==0 (
@@ -243,7 +244,7 @@ if %arch%==win32 (
             "%pyFTP%%pyversion%/python-%pyversion%!amdext!!pyext!" ^
             "%~dp0py%pyversion%!amdext!!pyext!"
         )
-        echo Installing...
+        echo %kilog% Installing...
     )
     if %admin%==0 (
         copy "%~dp0py%pyversion%!amdext!.msi" "%~dp0py%pyversion%_!amdext!.msi" >nul
@@ -290,9 +291,9 @@ if %admin%==0 (
 goto check
 
 :uninstall
-set /p choice_uninstall="Uninstall? y/n"
+set /p choice_uninstall="Uninstall the whole environment? y/n"
 set /p choice_pipcache="Remove cached pip files? y/n"
-set /p choice_dist="Remove dist folder? y/n"
+set /p choice_dist="Remove PyInstaller dist folder (if any)? y/n"
 if %arch%==win32 (
     set amdext=.amd64
     if !pyext!==.exe (
@@ -364,7 +365,7 @@ goto rmshortcuts
 
 :batupdate
 :: Download GitHub's raw output
-echo Checking for updates...
+echo %kilog% Checking for updates...
 %down% /transfer "GetKivyInstaller" "https://git.io/vDDjn" "%~dp0_update_kivy.bat"
 
 :: UNIX to WIN EOL (GitHub raw provides \n) with MORE /P
@@ -383,24 +384,24 @@ for /f "delims=" %%l in ('type "%~dp0update_kivy.bat"') do (
 )
 
 if %installerversion% lss %updateversion% (
-    echo You are using KivyInstaller version %installerversion%!
-    echo New version %updateversion% is available!
+    echo %kilog% You are using KivyInstaller version %installerversion%!
+    echo %kilog% - New version %updateversion% is available!
     if %onlycheck%==1 (
-        echo To install new version use - %~n0 batupdate
+        echo %kilog% - To install new version use - %~n0 batupdate
         del "%~dp0update_kivy.bat"
         goto console
     )
 ) else if %installerversion%==%updateversion% (
-    echo Your version is up to date!
+    echo %kilog% Your version is up to date!
     del "%~dp0update_kivy.bat"
     goto console
 )
 
 :: echo F for file
 :: After update an exit is needed, otherwise a cached file is used!
-echo Backing up the original file...
+echo %kilog% Backing up the original file...
 echo F | xcopy /y "%~dp0%~n0.bat" "%~dp0backup_kivy.bat"
-echo Updating...
+echo %kilog% Updating...
 (echo Y | xcopy "%~dp0update_kivy.bat" "%~dp0%~n0.bat") ^
 & del "%~dp0update_kivy.bat" & echo Done & exit
 
@@ -439,14 +440,14 @@ goto end
 
 :check
 if exist "%~dp0python.exe" (
-    echo Python is installed!
-    echo Installing pip...
+    echo %kilog% Python is installed!
+    echo %kilog% Installing pip...
     python -m ensurepip
 )
 if %installkivy%==0 (
     goto end
 )
-echo Preparing Python for Kivy...
+echo %kilog% Preparing Python for Kivy...
 python -m pip install --upgrade pip wheel setuptools
 set packurl=--extra-index-url https://kivy.org/downloads/packages/simple/
 set packages=docutils pygments pypiwin32 requests wget kivy.deps.sdl2 kivy.deps.glew ^
@@ -500,7 +501,7 @@ if %first%==0 (
         python -m pip uninstall -y kivy
         python -m pip install "%~dp0whls\Kivy-%master%.dev0-%cpwhl%-none-%arch%.whl"
     ) else (
-        echo No nightly wheel is available yet!
+        echo %kilog% No nightly wheel is available yet!
     )
 ) else (
     python -m pip install "%~dp0whls\Kivy-%master%.dev0-%cpwhl%-none-%arch%.whl"
@@ -521,7 +522,7 @@ for /f "tokens=3" %%c in ('%fnd%') do (set has_error=%%c)
 del /q "%~dp0error.txt"
 if %has_error%==0 (
     if not defined DEBUG (
-        echo Running touchtracer demo...
+        echo %kilog% Running touchtracer demo...
         start python "%~dp0share\kivy-examples\demo\touchtracer\main.py"
     )
     (echo cp=%cp%) > "%~dp0config.kivyinstaller"
@@ -542,7 +543,7 @@ if %has_error%==0 (
         type nul > "%~dp0extrapath.kivyinstaller"
     )
 ) else (
-    echo Kivy was not installed properly!
+    echo %kilog% Kivy was not installed properly!
     pause
     exit /B 1
 )
@@ -614,7 +615,7 @@ echo PATH:
 echo %PATH%
 if [%1]==[] goto console
 echo.
-echo Running "python.exe %*"
+echo %kilog% Running "python.exe %*"
 python %*
 if not %errorlevel%==0 (goto end)
 
@@ -673,14 +674,14 @@ for /f "delims=" %%A in (
     'python -c "from os.path import split;print(split('%d%'[:-1])[-1])" %2'
 ) do set "n=%%A"
 
-echo Collecting data...
+echo %kilog% Collecting data...
 python -m PyInstaller --debug --name "%n%" "%d%%nn%"
 
-echo Editing .spec file...
+echo %kilog% Editing .spec file...
 set f=from kivy.deps import sdl2, glew\na =
 set t=a.datas,*[Tree(p) for p in (sdl2.dep_bins + glew.dep_bins)],
 python -c "o=open;f=o('%n%.spec');t=f.read();f.close();f=o('%n%.spec','w');f.write(t.replace('\na = ','%f%').replace('a.datas,','%t%').replace('T(exe,','T(exe,Tree(\'%dd%\'),'));f.close();"
 
-echo Packaging...
+echo %kilog% Packaging...
 python -m PyInstaller "%n%.spec"
 goto end
