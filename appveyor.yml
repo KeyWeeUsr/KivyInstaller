@@ -306,14 +306,4 @@ build_script:
 
     if not %new_ver% gtr %old_ver% ( exit 1 )
 
-    REM ***********************************************************************
-    REM Test script uninstall command.                                        *
-    REM ***********************************************************************
-
-    set choice_pipcache=y
-
-    set choice_dist=y
-
-    (echo|set /p ___="y")|kivy uninstall
-
     dir "%cd%"
