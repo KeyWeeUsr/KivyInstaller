@@ -2,9 +2,10 @@ version: 1.0.{build}
 environment:
   AVRAW: https://raw.githubusercontent.com/appveyor/ci/master/scripts/
   AVFILE: enable-desktop.ps1
+  pyFTP: https://www.python.org/ftp/python/
   KVMASTER: 1.9.2
   LATESTPY2: 2.7.13
-  LATESTPY34: 3.4.6
+  LATESTPY34: 3.4.4
   LATESTPY35: 3.5.3
   LATESTPY36: 3.6.0
 
@@ -132,6 +133,40 @@ build_script:
     designer %DESIGNER%, shortcuts %SHORTCUTS%, cd %CD%
 
     REM ***********************************************************************
+    REM Uninstall global Python pre-installed by Appveyor                     *
+    REM ***********************************************************************
+
+    if "%ADMIN%"=="1" (
+        if "%PY%"=="35" (
+            if "%ARCH%"=="86" (
+                bitsadmin.exe /transfer "3586" ^
+                "%pyFTP%%LATESTPY35%/python-%LATESTPY35%.exe" ^
+                "%cd%\py%LATESTPY35%.exe" &
+                "%cd%\py%LATESTPY35%.exe" /uninstall /quiet
+            ) else if "%ARCH%"=="64" (
+                bitsadmin.exe /transfer "3564" ^
+                "%pyFTP%%LATESTPY35%/python-%LATESTPY35%-amd64.exe" ^
+                "%cd%\py%LATESTPY35%-amd64.exe" &
+                "%cd%\py%LATESTPY35%-amd64.exe" /uninstall /quiet
+            )
+        ) else if "%PY%"=="36" (
+            if "%ARCH%"=="86" (
+                bitsadmin.exe /transfer "3686" ^
+                "%pyFTP%%LATESTPY36%/python-%LATESTPY36%.exe" ^
+                "%cd%\py%LATESTPY36%.exe" &
+                "%cd%\py%LATESTPY36%.exe" /uninstall /quiet
+            ) else if "%ARCH%"=="64" (
+                bitsadmin.exe /transfer "3664" ^
+                "%pyFTP%%LATESTPY36%/python-%LATESTPY36%-amd64.exe" ^
+                "%cd%\py%LATESTPY36%-amd64.exe" &
+                "%cd%\py%LATESTPY36%-amd64.exe" /uninstall /quiet
+            )
+        )
+    )
+
+    del "%cd%\py*.exe"
+
+    REM ***********************************************************************
     REM Downgrade versions in kivy.bat manually for batupdate test later.     *
     REM                                                                       *
     REM Appveyor/Yaml file raises errors when a single colon (:) or two       *
@@ -175,13 +210,13 @@ build_script:
     set DEBUG=1 && set choice_python=3
 
     if "%PY%"=="27" (
-        set choice_python=2&& set py2=%LATESTPY2%
+        set choice_python=2&& set py2=%LATESTPY2%&& set cp2=cp27&&set ___=
     ) else if "%PY%"=="34" (
-        set py3=%LATESTPY34%
+        set py3=%LATESTPY34%&& set cp3=cp34&&set ___=
     ) else if "%PY%"=="35" (
-        set py3=%LATESTPY35%
+        set py3=%LATESTPY35%&& set cp3=cp35&&set ___=
     ) else if "%PY%"=="36" (
-        set py3=%LATESTPY36%
+        set py3=%LATESTPY36%&& set cp3=cp36&&set ___=
     )
 
     set choice_kivy=y && set choice_master=n
@@ -208,7 +243,7 @@ build_script:
         set choice_shrt=y
     )
 
-    set master=%KVMASTER% && set choice_ext=n && set choice_gst=n
+    set master=%KVMASTER%&& set choice_ext=n && set choice_gst=n
 
     REM ***********************************************************************
     REM ARCH option is the first asked option, therefore it needs a user      *
@@ -217,13 +252,21 @@ build_script:
     REM                                                                       *
     REM The ECHO runs the kivy.bat script that doesn't need any form of user  *
     REM interaction + DEBUG in the env forbids running the Touchtracer.       *
+    REM                                                                       *
+    REM (echoPset /p ___="y")P form sets a value without a newline from ECHO  *
     REM ***********************************************************************
 
     if "%ARCH%"=="86" (
-        (echo y)|kivy
+        (echo|set /p ___="y")|kivy.bat
     ) else if "%ARCH%"=="64" (
-        (echo n)|kivy
+        (echo|set /p ___="n")|kivy.bat
     )
+
+    REM ***********************************************************************
+    REM Check if Python was (re)installed correctly from kivy.bat.            *
+    REM ***********************************************************************
+
+    if not exist "%cd%\python.exe" (exit /B 1)
 
     REM ***********************************************************************
     REM Check kivy.bat launcher in Quick Launch and SendTo folders + print.   *
@@ -262,3 +305,15 @@ build_script:
     kivy version > _ver && set /p new_ver=<_ver && del _ver
 
     if not %new_ver% gtr %old_ver% ( exit 1 )
+
+    REM ***********************************************************************
+    REM Test script uninstall command.                                        *
+    REM ***********************************************************************
+
+    set choice_pipcache=y
+
+    set choice_dist=y
+
+    (echo|set /p ___="y")|kivy uninstall
+
+    dir "%cd%"

@@ -1,27 +1,27 @@
 ::Author: KeyWeeUsr @ https://github.com/KeyWeeUsr
-::Version: 3.2
+::Version: 3.3
 ::Inspired by kivy.bat file for kivy1.8.0
 ::To reset file just delete "config.kivyinstaller"
 ::Bitsadmin is available since winXP SP2
 ::If it is not available, download and install to C:\Windows
 ::https://www.microsoft.com/en-us/download/details.aspx?id=18546
 @if not defined DEBUG (echo off)
+if not defined cp2 (set cp2=cp27)
+if not defined cp3 (set cp3=cp35)
+if not defined py2 (set py2=2.7.13)
+if not defined py3 (set py3=3.5.2)
+if not defined master (set master=1.9.2)
 set xp=0
 set cp=0
 set first=1
+set admin=1
 set cpwhl=0
 set stable=1
-set cp2=cp27
-set cp3=cp35
-set py3=3.5.2
 set arch=win32
-set py2=2.7.13
 set pyversion=0
 set gstreamer=0
-set master=1.9.2
 set installkivy=1
-set installerversion=3.2
-set admin=1
+set installerversion=3.3
 set kilog=[KivyInstaller]
 setlocal ENABLEDELAYEDEXPANSION
 title = KivyInstaller %installerversion%
@@ -77,9 +77,9 @@ if not %first%==1 (
 )
 if %processor_architecture%==AMD64 (
     set /p arch32="64bit environment detected! Create 32bit instead? y/n"
-    if !arch32!==n (
-        set arch=win_amd64
-    )
+)
+if [%arch32%]==[n] (
+    set arch=win_amd64
 )
 if exist "%~dp0python.exe" (
     echo %kilog% Python is already installed!
@@ -162,6 +162,7 @@ if %choice_shrt%==y (
 if !kivycontinue!==y (
     goto check
 )
+:: needs fixing for webinstallers
 if %arch%==win32 (
     if exist "%~dp0py%pyversion%!pyext!" (
         echo %kilog% Installer is already downloaded!
@@ -295,10 +296,6 @@ set /p choice_uninstall="Uninstall the whole environment? y/n"
 set /p choice_pipcache="Remove cached pip files? y/n"
 set /p choice_dist="Remove PyInstaller dist folder (if any)? y/n"
 if %arch%==win32 (
-    set amdext=.amd64
-    if !pyext!==.exe (
-        set amdext=-amd64
-    )
     if not exist "%~dp0py%pyversion%!pyext!" (
         %down% /transfer "GetPython%pyversion%!pyext!" ^
         "%pyFTP%%pyversion%/python-%pyversion%!pyext!" ^
@@ -313,11 +310,15 @@ if %arch%==win32 (
             if !pyext!==.msi (
                 msiexec.exe /x "%~dp0py%pyversion%.msi" /qb
             ) else if !pyext!==.exe (
-                "%~dp0py%pyversion%.msi" /uninstall
+                "%~dp0py%pyversion%.exe" /uninstall
             )
         )
     ) else (goto end)
 ) else (
+    set amdext=.amd64
+    if !pyext!==.exe (
+        set amdext=-amd64
+    )
     if not exist "%~dp0py%pyversion%%amdext%!pyext!" (
         %down% /transfer "GetPython%pyversion%%amdext%!pyext!" ^
         "%pyFTP%%pyversion%/python-%pyversion%%amdext%!pyext!" ^
@@ -412,57 +413,58 @@ echo.
 echo Usage:
 echo   %~n0 [options]
 echo.
-echo   ^<file^>                  Run python(.py) file.
-echo   update                  Update kivy wheel to the latest stable.
-echo   updatemaster            Update kivy wheel to the latest nightly-build.
-echo   batcheck                Check for new KivyInstaller version only.
-echo   batupdate               Check for new KivyInstaller version and update.
-echo   remove                  Uninstall kivy only.
-echo   uninstall               Uninstall kivy, python and leave only %~n0.bat.
-echo   mkshortcuts             Create shortcuts for SendTo and TaskBar.
-echo   rmshortcuts             Remove shortcuts for SendTo and TaskBar.
-echo   pack "<path to .py>"    Quick packaging with pyinstaller.
-echo   version                 Prints version of the KivyInstaller.
-echo   help                    Show this.
+echo   ^<file^>                   Run python(.py) file
+echo   update                   Update kivy wheel to the latest stable
+echo   updatemaster             Update kivy wheel to the latest nightly-build
+echo   batcheck                 Check for new KivyInstaller version only
+echo   batupdate                Check for new KivyInstaller version and update
+echo   remove                   Uninstall kivy only
+echo   uninstall                Uninstall kivy, python and leave only %~n0.bat
+echo   mkshortcuts              Create shortcuts for SendTo and TaskBar
+echo   rmshortcuts              Remove shortcuts for SendTo and TaskBar
+echo   pack "<abs path to .py>" Quick packaging with pyinstaller
+echo   version                  Prints version of the KivyInstaller
+echo   help                     Show this
 echo.
 echo Optional:
-echo   idle                    Python(.py) text editor with syntax highlighting
-echo   pyinstaller             Executable packager for Python programs
+echo   idle                     Python text editor with syntax highlighting
+echo   pyinstaller              Executable packager for Python programs
 echo.
 echo Extra install:
-echo   getdesigner             Install Kivy Designer (python -m designer)
-echo   getgcc                  Install GNU Compiler Collection (mingw32-make, gcc)
-echo   getmsvc                 Opens a link for downloading Visual C++ Build Tools
+echo   getdesigner              Install Kivy Designer (python -m designer)
+echo   getgcc                   Install GNU Compiler Collection (mingw32-make, gcc)
+echo   getmsvc                  Open an URL for Visual C++ Build Tools
 echo.
 echo ExtraPATH:
 echo   Write new PATH as it is. Separate with ; . No quotes, no ; at the end.
 goto end
 
 :check
+if defined DEBUG (type "%~dp0msi.log")
 if exist "%~dp0python.exe" (
     echo %kilog% Python is installed!
     echo %kilog% Installing pip...
-    python -m ensurepip
+    "%~dp0python.exe" -m ensurepip
 )
 if %installkivy%==0 (
     goto end
 )
 echo %kilog% Preparing Python for Kivy...
-python -m pip install --upgrade pip wheel setuptools
+"%~dp0python.exe" -m pip install --upgrade pip wheel setuptools
 set packurl=--extra-index-url https://kivy.org/downloads/packages/simple/
 set packages=docutils pygments pypiwin32 requests wget kivy.deps.sdl2 kivy.deps.glew ^
 pyinstaller
 if %gstreamer%==1 (
-    python -m pip install %packages% kivy.deps.gstreamer %packurl%
+    "%~dp0python.exe" -m pip install %packages% kivy.deps.gstreamer %packurl%
 ) else (
-    python -m pip install %packages% %packurl%
+    "%~dp0python.exe" -m pip install %packages% %packurl%
 )
-python -m pip install -I https://kivy.org/downloads/appveyor/kivy/Kivy_examples-1.9.2.dev0-py2.py3-none-any.whl
+"%~dp0python.exe" -m pip install -I https://kivy.org/downloads/appveyor/kivy/Kivy_examples-1.9.2.dev0-py2.py3-none-any.whl
 if %stable%==1 (
-    python -m pip uninstall -y kivy
-    python -m pip install kivy
+    "%~dp0python.exe" -m pip uninstall -y kivy
+    "%~dp0python.exe" -m pip install kivy
     if !designer!==1 (
-        python -m pip install https://github.com/kivy/kivy-designer/zipball/master
+        "%~dp0python.exe" -m pip install https://github.com/kivy/kivy-designer/zipball/master
     )
     goto kivyend
 )
@@ -494,20 +496,20 @@ echo.root=op.dirname(op.abspath(sys.executable))>> "%~dp0getnightly.py"
 echo.whl=op.basename(max(glob.glob(root+'/whls/*.[Ww][Hh][Ll]*'),key=op.getctime))>>"%~dp0getnightly.py"
 echo.new='Kivy-%master%.dev0-%cpwhl%-none-%arch%.whl'>> "%~dp0getnightly.py"
 echo.shutil.copy2(root+'\\whls\\'+whl,root+'\\whls\\'+new)>> "%~dp0getnightly.py"
-python "%~dp0getnightly.py"
+"%~dp0python.exe" "%~dp0getnightly.py"
 if not defined DEBUG (del "%~dp0getnightly.py")
 if %first%==0 (
     if exist "%~dp0whls\Kivy-%master%.dev0-%cpwhl%-none-%arch%.whl" (
-        python -m pip uninstall -y kivy
-        python -m pip install "%~dp0whls\Kivy-%master%.dev0-%cpwhl%-none-%arch%.whl"
+        "%~dp0python.exe" -m pip uninstall -y kivy
+        "%~dp0python.exe" -m pip install "%~dp0whls\Kivy-%master%.dev0-%cpwhl%-none-%arch%.whl"
     ) else (
         echo %kilog% No nightly wheel is available yet!
     )
 ) else (
-    python -m pip install "%~dp0whls\Kivy-%master%.dev0-%cpwhl%-none-%arch%.whl"
+    "%~dp0python.exe" -m pip install "%~dp0whls\Kivy-%master%.dev0-%cpwhl%-none-%arch%.whl"
 )
 if !designer!==1 (
-    python -m pip install https://github.com/kivy/kivy-designer/zipball/master
+    "%~dp0python.exe" -m pip install https://github.com/kivy/kivy-designer/zipball/master
 )
 del /q "%~dp0whls\Kivy-%master%.dev0-%cpwhl%-none-%arch%.whl"
 
@@ -516,14 +518,14 @@ if not defined DEBUG (
     del /q "%~dp0msi.log"
 )
 set PATH=%~dp0;%~dp0Tools;%~dp0Scripts;%~dp0share\sdl2\bin;%~dp0Lib\idlelib;%PATH%
->"%~dp0error.txt" python -c "exec(\"try:\n    import kivy;\nexcept ImportError:\n    print('unsuccessful');\")"
+>"%~dp0error.txt" "%~dp0python.exe" -c "exec(\"try:\n    import kivy;\nexcept ImportError:\n    print('unsuccessful');\")"
 set fnd=find /c "unsuccessful" "%~dp0error.txt"
 for /f "tokens=3" %%c in ('%fnd%') do (set has_error=%%c)
 del /q "%~dp0error.txt"
 if %has_error%==0 (
     if not defined DEBUG (
         echo %kilog% Running touchtracer demo...
-        start python "%~dp0share\kivy-examples\demo\touchtracer\main.py"
+        start cmd /c "%~dp0python.exe %~dp0share\kivy-examples\demo\touchtracer\main.py"
     )
     (echo cp=%cp%) > "%~dp0config.kivyinstaller"
     (echo cpwhl=%cpwhl%) >> "%~dp0config.kivyinstaller"
@@ -574,7 +576,7 @@ if [%1]==[update] (
     set stable=0
     goto check
 ) else if [%1]==[remove] (
-    python -m pip uninstall -y kivy
+    "%~dp0python.exe" -m pip uninstall -y kivy
 ) else if [%1]==[uninstall] (
     goto uninstall
 ) else if [%1]==[batcheck] (
@@ -591,10 +593,10 @@ if [%1]==[update] (
 ) else if [%1]==[pack] (
     goto pack
 ) else if [%1]==[getdesigner] (
-    python -m pip install -I -U https://github.com/kivy/kivy-designer/zipball/master
+    "%~dp0python.exe" -m pip install -I -U https://github.com/kivy/kivy-designer/zipball/master
     goto end
 ) else if [%1]==[getgcc] (
-    python -m pip install -I -U -i https://pypi.anaconda.org/carlkl/simple mingwpy
+    "%~dp0python.exe" -m pip install -I -U -i https://pypi.anaconda.org/carlkl/simple mingwpy
     start "" "https://kivy.org/docs/installation/installation-windows.html#use-development-kivy"
     goto end
 ) else if [%1]==[getmsvc] (
@@ -616,7 +618,7 @@ echo %PATH%
 if [%1]==[] goto console
 echo.
 echo %kilog% Running "python.exe %*"
-python %*
+"%~dp0python.exe" %*
 if not %errorlevel%==0 (goto end)
 
 :end
@@ -627,12 +629,12 @@ exit
 echo.
 echo ###############################################################################
 @if not defined DEBUG (echo off)
-python -c "import sys; print('.'.join(str(x) for x in sys.version_info[:3]))" > t
+"%~dp0python.exe" -c "import sys; print('.'.join(str(x) for x in sys.version_info[:3]))" > t
 set /p python_version=<t
 set kv_imp=import kivy;f=open('t','w');f.write(kivy
-start "" /min /wait python.exe -c "%kv_imp%.__version__);f.close()"
+start "" /min /wait "%~dp0python.exe" -c "%kv_imp%.__version__);f.close()"
 set /p kivy_version=<t
-start "" /min /wait python.exe -c "%kv_imp%.__date__);f.close()"
+start "" /min /wait "%~dp0python.exe" -c "%kv_imp%.__date__);f.close()"
 set /p wheel_version=<t
 del t
 echo - KivyInstaller: %installerversion%
@@ -642,7 +644,7 @@ echo - Wheel:         %wheel_version%
 echo - Update Kivy:   %~n0 update or %~n0 updatemaster
 echo - Examples:      share\kivy-examples
 echo - Launch:        %~n0 main.py or python main.py
-echo - Pack:          %~n0 pack "<path>"
+echo - Pack:          %~n0 pack "<abs path to .py>"
 echo - Uninstall:     %~n0 uninstall
 echo ###############################################################################
 echo.
@@ -659,29 +661,29 @@ set sy=import sys
 set n_imp=from os.path import basename as b;%sy%
 
 for /f "delims=" %%A in (
-    'python -c "%n_imp%;print(b(sys.argv[1]))" %2'
+    '%~dp0python.exe -c "%n_imp%;print(b(sys.argv[1]))" %2'
 ) do set "nn=%%A"
 
 for /f "delims=" %%A in (
-    'python -c "%sy%;print(sys.argv[1].replace('%nn%','').replace('\\', '\\\\'))" %2'
+    '%~dp0python.exe -c "%sy%;print(sys.argv[1].replace('%nn%','').replace('\\', '\\\\'))" %2'
 ) do set "d=%%A"
 
 for /f "delims=" %%A in (
-    'python -c "%sy%;print(sys.argv[1].replace('\\', '\\\\\\\\'))" "%d%"'
+    '%~dp0python.exe -c "%sy%;print(sys.argv[1].replace('\\', '\\\\\\\\'))" "%d%"'
 ) do set "dd=%%A"
 
 for /f "delims=" %%A in (
-    'python -c "from os.path import split;print(split('%d%'[:-1])[-1])" %2'
+    '%~dp0python.exe -c "from os.path import split;print(split('%d%'[:-1])[-1])" %2'
 ) do set "n=%%A"
 
 echo %kilog% Collecting data...
-python -m PyInstaller --debug --name "%n%" "%d%%nn%"
+"%~dp0python.exe" -m PyInstaller -y --debug --name "%n%" "%d%%nn%"
 
 echo %kilog% Editing .spec file...
 set f=from kivy.deps import sdl2, glew\na =
 set t=a.datas,*[Tree(p) for p in (sdl2.dep_bins + glew.dep_bins)],
-python -c "o=open;f=o('%n%.spec');t=f.read();f.close();f=o('%n%.spec','w');f.write(t.replace('\na = ','%f%').replace('a.datas,','%t%').replace('T(exe,','T(exe,Tree(\'%dd%\'),'));f.close();"
+"%~dp0python.exe" -c "o=open;f=o('%n%.spec');t=f.read();f.close();f=o('%n%.spec','w');f.write(t.replace('\na = ','%f%').replace('a.datas,','%t%').replace('T(exe,','T(exe,Tree(\'%dd%\'),'));f.close();"
 
 echo %kilog% Packaging...
-python -m PyInstaller "%n%.spec"
+"%~dp0python.exe" -m PyInstaller "%n%.spec" -y
 goto end
