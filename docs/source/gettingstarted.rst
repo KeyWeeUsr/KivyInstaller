@@ -24,7 +24,18 @@ Defaults
 - kivy-master ``1.9.2``
 - kivy-stable is from pypi
 
-Change them freely inside batch file if you need.
+Since version `3.3` you are able to change the defaults from the console
+*before* actually running the ``kivy.bat`` script this way::
+
+    set cp3=cp35      # or cp34 or cp36
+    set cp2=cp27      # shouldn't be necessary to change
+    set py3=3.5.2     # check on python website if the version exists!
+    set py2=2.7.13    # same here
+    set master=1.9.2  # check on Kivy installation page for Windows
+
+or change them freely inside the batch file if you need. Kivy master version
+shouldn't really need to be changed anyway as I'll switch manually the value
+when there's a new version for master branch.
 
 Admin installation catch
 ------------------------
