@@ -1,5 +1,5 @@
 ::Author: KeyWeeUsr @ https://github.com/KeyWeeUsr
-::Version: 3.3
+::Version: 3.4
 ::Inspired by kivy.bat file for kivy1.8.0
 ::To reset file just delete "config.kivyinstaller"
 ::Bitsadmin is available since winXP SP2
@@ -21,7 +21,7 @@ set arch=win32
 set pyversion=0
 set gstreamer=0
 set installkivy=1
-set installerversion=3.3
+set installerversion=3.4
 set kilog=[KivyInstaller]
 setlocal ENABLEDELAYEDEXPANSION
 title = KivyInstaller %installerversion%
@@ -469,35 +469,61 @@ if %stable%==1 (
     goto kivyend
 )
 mkdir "%~dp0whls"
+
+:: Download nightly wheels from kivy.org FTP [PY]
 echo.import os,glob,sys,re,requests,wget,datetime,shutil> "%~dp0getnightly.py"
 echo.import os.path as op; import datetime as dt>> "%~dp0getnightly.py"
-echo.fid = {'cp27_win32':'Kivy-%master%.dev0-cp27-cp27m-win32.whl',>> "%~dp0getnightly.py"
-echo.       'cp34_win32':'Kivy-%master%.dev0-cp34-cp34m-win32.whl',>> "%~dp0getnightly.py"
-echo.       'cp35_win32':'Kivy-%master%.dev0-cp35-cp35m-win32.whl',>> "%~dp0getnightly.py"
-echo.       'cp36_win32':'Kivy-%master%.dev0-cp36-cp36m-win32.whl',>> "%~dp0getnightly.py"
-echo.       'cp27_win_amd64':'Kivy-%master%.dev0-cp27-cp27m-win_amd64.whl',>> "%~dp0getnightly.py"
-echo.       'cp34_win_amd64':'Kivy-%master%.dev0-cp34-cp34m-win_amd64.whl',>> "%~dp0getnightly.py"
-echo.       'cp35_win_amd64':'Kivy-%master%.dev0-cp35-cp35m-win_amd64.whl',>> "%~dp0getnightly.py"
-echo.       'cp36_win_amd64':'Kivy-%master%.dev0-cp36-cp36m-win_amd64.whl'}>> "%~dp0getnightly.py"
->>"%~dp0getnightly.py" echo.y = '{:%%d%%m%%Y}'.format(dt.datetime.now()-dt.timedelta(days=1))
+echo.k = 'Kivy-%master%.dev0-'>> "%~dp0getnightly.py"
+echo.w32 = '-win32.whl'>> "%~dp0getnightly.py"
+echo.a64 = '-win_amd64.whl'>> "%~dp0getnightly.py"
+echo.fid = {>> "%~dp0getnightly.py"
+echo.    'cp27_win32': k + 'cp27-cp27m' + w32,>> "%~dp0getnightly.py"
+echo.    'cp34_win32': k + 'cp34-cp34m' + w32,>> "%~dp0getnightly.py"
+echo.    'cp35_win32': k + 'cp35-cp35m' + w32,>> "%~dp0getnightly.py"
+echo.    'cp36_win32': k + 'cp36-cp36m' + w32,>> "%~dp0getnightly.py"
+echo.    'cp27_win_amd64': k + 'cp27-cp27m' + a64,>> "%~dp0getnightly.py"
+echo.    'cp34_win_amd64': k + 'cp34-cp34m' + a64,>> "%~dp0getnightly.py"
+echo.    'cp35_win_amd64': k + 'cp35-cp35m' + a64,>> "%~dp0getnightly.py"
+echo.    'cp36_win_amd64': k + 'cp36-cp36m' + a64>> "%~dp0getnightly.py"
+echo.}>> "%~dp0getnightly.py"
+:: escape % here
+echo.y = '{:%%d%%m%%Y}'.format(>> "%~dp0getnightly.py"
+echo.    dt.datetime.now() - dt.timedelta(days=1)>> "%~dp0getnightly.py"
+echo.)>> "%~dp0getnightly.py"
 echo.file_id = fid['%cpwhl%_%arch%']>>"%~dp0getnightly.py"
-echo.file_name = 'Kivy-%master%.dev0_'+y+'-%cpwhl%-%cp%-%arch%.whl'>> "%~dp0getnightly.py"
-echo.link = 'https://kivy.org/downloads/appveyor/kivy/'+file_id>> "%~dp0getnightly.py"
-echo.p = op.dirname(op.abspath(__file__))+'\\whls\\'+file_name.replace('%cp%','none')>> "%~dp0getnightly.py"
+echo.file_name = 'Kivy-%master%.dev0_'>> "%~dp0getnightly.py"
+echo.file_name += y + '-%cpwhl%-%cp%-%arch%.whl'>> "%~dp0getnightly.py"
+echo.link = 'https://kivy.org/downloads/appveyor/kivy/'>> "%~dp0getnightly.py"
+echo.link += file_id>> "%~dp0getnightly.py"
+echo.p = op.join(>> "%~dp0getnightly.py"
+echo.    op.dirname(op.abspath(__file__)),>> "%~dp0getnightly.py"
+echo.    'whls', file_name.replace('%cp%', 'none')>> "%~dp0getnightly.py"
+echo.)>> "%~dp0getnightly.py"
 echo.try:>>"%~dp0getnightly.py"
-echo.    wget.download(link,p)>> "%~dp0getnightly.py"
+echo.    wget.download(link, p)>> "%~dp0getnightly.py"
 echo.except:>>"%~dp0getnightly.py"
-echo.    with open(p,'wb') as f:>>"%~dp0getnightly.py"
+echo.    with open(p, 'wb') as f:>>"%~dp0getnightly.py"
 echo.        import ssl>>"%~dp0getnightly.py"
 echo.        import urllib.request as ulib>>"%~dp0getnightly.py"
-echo.        f.write(ulib.urlopen(link,context=ssl._create_unverified_context()).read())>>"%~dp0getnightly.py"
+echo.        f.write(ulib.urlopen(>>"%~dp0getnightly.py"
+echo.            link,>>"%~dp0getnightly.py"
+echo.            context=ssl._create_unverified_context()>>"%~dp0getnightly.py"
+echo.        ).read())>>"%~dp0getnightly.py"
 echo.print('\nWheel downloaded...')>> "%~dp0getnightly.py"
-echo.root=op.dirname(op.abspath(sys.executable))>> "%~dp0getnightly.py"
-echo.whl=op.basename(max(glob.glob(root+'/whls/*.[Ww][Hh][Ll]*'),key=op.getctime))>>"%~dp0getnightly.py"
-echo.new='Kivy-%master%.dev0-%cpwhl%-none-%arch%.whl'>> "%~dp0getnightly.py"
-echo.shutil.copy2(root+'\\whls\\'+whl,root+'\\whls\\'+new)>> "%~dp0getnightly.py"
+echo.root = op.dirname(op.abspath(sys.executable))>> "%~dp0getnightly.py"
+echo.whl = op.basename(max(>>"%~dp0getnightly.py"
+echo.    glob.glob(root + '/whls/*.[Ww][Hh][Ll]*'),>>"%~dp0getnightly.py"
+echo.    key=op.getctime>>"%~dp0getnightly.py"
+echo.))>>"%~dp0getnightly.py"
+echo.new = 'Kivy-%master%.dev0-%cpwhl%-none-%arch%.whl'>> "%~dp0getnightly.py"
+echo.shutil.copy2(>> "%~dp0getnightly.py"
+echo.    op.join(root, 'whls', whl),>> "%~dp0getnightly.py"
+echo.    op.join(root, 'whls', new)>> "%~dp0getnightly.py"
+echo.)>> "%~dp0getnightly.py"
+
 "%~dp0python.exe" "%~dp0getnightly.py"
 if not defined DEBUG (del "%~dp0getnightly.py")
+
 if %first%==0 (
     if exist "%~dp0whls\Kivy-%master%.dev0-%cpwhl%-none-%arch%.whl" (
         "%~dp0python.exe" -m pip uninstall -y kivy
@@ -551,6 +577,7 @@ if %has_error%==0 (
 )
 
 :mkshortcuts
+:: Create a launcher that triggers kivy.bat remotely [BAT]
 if !shortcuts!==1 (
     (echo @echo off) > "%taskbar%\Kivy%shrtct%.bat"
     (echo if "%%~1"=="" ^() >> "%taskbar%\Kivy%shrtct%.bat"
@@ -652,38 +679,63 @@ cmd
 exit
 
 :pack
+:: Package simple Kivy apps (Standard library + Kivy+GLEW+ANGLE+SDL2+GST) [PY]
 if not [%1]==[pack] (
     pause
     exit
 )
 
-set sy=import sys
-set n_imp=from os.path import basename as b;%sy%
+:: Expected: kivy pack "%cd%\share\kivy-examples\demo\touchtracer\main.py"
 
-for /f "delims=" %%A in (
-    '%~dp0python.exe -c "%n_imp%;print(b(sys.argv[1]))" %2'
-) do set "nn=%%A"
+:: Get .py name, fullpath folder, parent folder (for app name), then build
+echo.import os, sys, subprocess> "%~dp0kvpack.py"
+echo.from os.path import join, split>> "%~dp0kvpack.py"
+echo.folder, main_name = split(sys.argv[1])>> "%~dp0kvpack.py"
+echo.name = os.path.split(folder)[-1]>> "%~dp0kvpack.py"
+echo.print(os.environ['kilog'] + ' Collecting data...')>> "%~dp0kvpack.py"
+echo.subprocess.call([>> "%~dp0kvpack.py"
+echo.    r'%~dp0python.exe', '-m', 'PyInstaller', '-y',>> "%~dp0kvpack.py"
+echo.    '--debug', '--name', name, join(folder, main_name)>> "%~dp0kvpack.py"
+echo.])>> "%~dp0kvpack.py"
+echo.print(os.environ['kilog'] + ' Editing .spec file...')>> "%~dp0kvpack.py"
+echo.gl = "from kivy.deps.glew import dep_bins as gl">> "%~dp0kvpack.py"
+echo.sd = "from kivy.deps.sdl2 import dep_bins as sd">> "%~dp0kvpack.py"
+echo.gs = (>> "%~dp0kvpack.py"
+echo.    "try:\n    ">> "%~dp0kvpack.py"
+echo.    "from kivy.deps.gstreamer import dep_bins as gs\n">> "%~dp0kvpack.py"
+echo.    "except ImportError:\n    ">> "%~dp0kvpack.py"
+echo.    "gs = []\n">> "%~dp0kvpack.py"
+echo.)>> "%~dp0kvpack.py"
+echo.ag = (>> "%~dp0kvpack.py"
+echo.    "try:\n    ">> "%~dp0kvpack.py"
+echo.    "from kivy.deps.angle import dep_bins as ag\n">> "%~dp0kvpack.py"
+echo.    "except ImportError:\n    ">> "%~dp0kvpack.py"
+echo.    "ag = []">> "%~dp0kvpack.py"
+echo.)>> "%~dp0kvpack.py"
+echo.try:>> "%~dp0kvpack.py"
+echo.    import kivy.deps.gstreamer>> "%~dp0kvpack.py"
+echo.except ImportError:>> "%~dp0kvpack.py"
+echo.    gst = []>> "%~dp0kvpack.py"
+echo.try:>> "%~dp0kvpack.py"
+echo.    import kivy.deps.angle>> "%~dp0kvpack.py"
+echo.except ImportError:>> "%~dp0kvpack.py"
+echo.    ang = []>> "%~dp0kvpack.py"
+echo.imp = '\n'.join([gl, sd, gs, ag, 'a = '])>> "%~dp0kvpack.py"
+echo.t = "a.datas, *[Tree(p) for p in (gl + sd + gs + ag)],">> "%~dp0kvpack.py"
+echo.with open(name + '.spec') as f:>> "%~dp0kvpack.py"
+echo.    cont = f.read()>> "%~dp0kvpack.py"
+echo.n = cont.replace('\na = ', imp).replace('a.datas,', t)>> "%~dp0kvpack.py"
+echo.n = n.replace("T(exe,", "T(exe, Tree(r'"+folder+"'),")>> "%~dp0kvpack.py"
+echo.with open(name + '.spec', 'w') as f:>> "%~dp0kvpack.py"
+echo.    f.write(n)>> "%~dp0kvpack.py"
+echo.print(os.environ['kilog'] + ' Packaging...')>> "%~dp0kvpack.py"
+echo.subprocess.call([>> "%~dp0kvpack.py"
+echo.    r'%~dp0python.exe', '-m', 'PyInstaller',>> "%~dp0kvpack.py"
+echo.    name + '.spec', '-y'>> "%~dp0kvpack.py"
+echo.])>> "%~dp0kvpack.py"
+echo.print(os.environ['kilog'] + ' Done.')>> "%~dp0kvpack.py"
 
-for /f "delims=" %%A in (
-    '%~dp0python.exe -c "%sy%;print(sys.argv[1].replace('%nn%','').replace('\\', '\\\\'))" %2'
-) do set "d=%%A"
+"%~dp0python.exe" "%~dp0kvpack.py" %2
 
-for /f "delims=" %%A in (
-    '%~dp0python.exe -c "%sy%;print(sys.argv[1].replace('\\', '\\\\\\\\'))" "%d%"'
-) do set "dd=%%A"
-
-for /f "delims=" %%A in (
-    '%~dp0python.exe -c "from os.path import split;print(split('%d%'[:-1])[-1])" %2'
-) do set "n=%%A"
-
-echo %kilog% Collecting data...
-"%~dp0python.exe" -m PyInstaller -y --debug --name "%n%" "%d%%nn%"
-
-echo %kilog% Editing .spec file...
-set f=from kivy.deps import sdl2, glew\na =
-set t=a.datas,*[Tree(p) for p in (sdl2.dep_bins + glew.dep_bins)],
-"%~dp0python.exe" -c "o=open;f=o('%n%.spec');t=f.read();f.close();f=o('%n%.spec','w');f.write(t.replace('\na = ','%f%').replace('a.datas,','%t%').replace('T(exe,','T(exe,Tree(\'%dd%\'),'));f.close();"
-
-echo %kilog% Packaging...
-"%~dp0python.exe" -m PyInstaller "%n%.spec" -y
+if not defined DEBUG (del "%~dp0kvpack.py")
 goto end
