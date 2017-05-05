@@ -7,7 +7,7 @@ environment:
   LATESTPY2: 2.7.13
   LATESTPY34: 3.4.4
   LATESTPY35: 3.5.3
-  LATESTPY36: 3.6.0
+  LATESTPY36: 3.6.1
 
   matrix:
   - PY: 27
@@ -134,6 +134,7 @@ build_script:
 
     REM ***********************************************************************
     REM Uninstall global Python pre-installed by Appveyor                     *
+    REM versions www.appveyor.com/docs/build-environment/#python              *
     REM ***********************************************************************
 
     if "%ADMIN%"=="1" (
