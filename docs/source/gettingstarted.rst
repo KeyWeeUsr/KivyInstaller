@@ -21,7 +21,7 @@ Defaults
 --------
 
 - Python versions ``2.7.13``, ``3.5.2``
-- kivy-master ``1.9.2``
+- kivy-master ``1.10.1``
 - kivy-stable is from pypi
 
 Since version `3.3` you are able to change the defaults from the console
@@ -31,7 +31,7 @@ Since version `3.3` you are able to change the defaults from the console
     set cp2=cp27      # shouldn't be necessary to change
     set py3=3.5.2     # check on python website if the version exists!
     set py2=2.7.13    # same here
-    set master=1.9.2  # check on Kivy installation page for Windows
+    set master=1.10.1 # check on Kivy installation page for Windows
 
 or change them freely inside the batch file if you need. Kivy master version
 shouldn't really need to be changed anyway as I'll switch manually the value

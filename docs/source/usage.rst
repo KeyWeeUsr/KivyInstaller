@@ -57,7 +57,7 @@ Update
 
 KivyInstaller uses Kivy wheels for installation:
 
-- ``stable`` on `pypi <https://pypi.python.org/pypi/Kivy/1.9.1>`_
+- ``stable`` on `pypi <https://pypi.python.org/pypi/Kivy/1.10.0>`_
 - ``master`` on |master_drive|_
 
 To update already installed Kivy use one of these commands::

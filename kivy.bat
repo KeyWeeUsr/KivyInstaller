@@ -1,5 +1,5 @@
 ::Author: KeyWeeUsr @ https://github.com/KeyWeeUsr
-::Version: 3.4
+::Version: 3.5
 ::Inspired by kivy.bat file for kivy1.8.0
 ::To reset file just delete "config.kivyinstaller"
 ::Bitsadmin is available since winXP SP2
@@ -10,7 +10,7 @@ if not defined cp2 (set cp2=cp27)
 if not defined cp3 (set cp3=cp35)
 if not defined py2 (set py2=2.7.13)
 if not defined py3 (set py3=3.5.2)
-if not defined master (set master=1.9.2)
+if not defined master (set master=1.10.1)
 set xp=0
 set cp=0
 set first=1
@@ -21,7 +21,7 @@ set arch=win32
 set pyversion=0
 set gstreamer=0
 set installkivy=1
-set installerversion=3.4
+set installerversion=3.5
 set kilog=[KivyInstaller]
 setlocal ENABLEDELAYEDEXPANSION
 title = KivyInstaller %installerversion%
@@ -459,7 +459,7 @@ if %gstreamer%==1 (
 ) else (
     "%~dp0python.exe" -m pip install %packages% %packurl%
 )
-"%~dp0python.exe" -m pip install -I https://kivy.org/downloads/appveyor/kivy/Kivy_examples-1.9.2.dev0-py2.py3-none-any.whl
+"%~dp0python.exe" -m pip install -I https://kivy.org/downloads/appveyor/kivy/Kivy_examples-%master%.dev0-py2.py3-none-any.whl
 if %stable%==1 (
     "%~dp0python.exe" -m pip uninstall -y kivy
     "%~dp0python.exe" -m pip install kivy
