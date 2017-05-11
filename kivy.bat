@@ -1,5 +1,5 @@
 ::Author: KeyWeeUsr @ https://github.com/KeyWeeUsr
-::Version: 3.5
+::Version: 3.6
 ::Inspired by kivy.bat file for kivy1.8.0
 ::To reset file just delete "config.kivyinstaller"
 ::Bitsadmin is available since winXP SP2
@@ -21,7 +21,7 @@ set arch=win32
 set pyversion=0
 set gstreamer=0
 set installkivy=1
-set installerversion=3.5
+set installerversion=3.6
 set kilog=[KivyInstaller]
 setlocal ENABLEDELAYEDEXPANSION
 title = KivyInstaller %installerversion%
@@ -544,10 +544,11 @@ if not defined DEBUG (
     del /q "%~dp0msi.log"
 )
 set PATH=%~dp0;%~dp0Tools;%~dp0Scripts;%~dp0share\sdl2\bin;%~dp0Lib\idlelib;%PATH%
->"%~dp0error.txt" "%~dp0python.exe" -c "exec(\"try:\n    import kivy;\nexcept ImportError:\n    print('unsuccessful');\")"
-set fnd=find /c "unsuccessful" "%~dp0error.txt"
-for /f "tokens=3" %%c in ('%fnd%') do (set has_error=%%c)
-del /q "%~dp0error.txt"
+
+:: Check if Kivy can be imported, presume it can't
+set has_error=1
+"%~dp0python.exe" -c "import kivy" && set has_error=0
+
 if %has_error%==0 (
     if not defined DEBUG (
         echo %kilog% Running touchtracer demo...
@@ -570,6 +571,7 @@ if %has_error%==0 (
     if not exist "%~dp0extrapath.kivyinstaller" (
         type nul > "%~dp0extrapath.kivyinstaller"
     )
+    echo %kilog% Configuration created in "%~dp0config.kivyinstaller"
 ) else (
     echo %kilog% Kivy was not installed properly!
     pause
