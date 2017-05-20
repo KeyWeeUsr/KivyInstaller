@@ -21,6 +21,13 @@ Known problems
 
 - |msvcr|_ is missing. You need to download it.
 
+- Python 3.5+ installation fails on stock: Windows Vista, Windows 7, probably
+  even on Windows 8. On Windows 7 you'll need at least Service Pack 1 with
+  its updates. Similar updates related stuff applies for Vista and 8.
+
+- Bitsadmin didn't finish the downloading correctly and threw some error in
+  HEX such as ``Unable to complete job - 0x80200002``. See |bitser|_.
+
 Report an issue
 ---------------
 
@@ -28,6 +35,8 @@ If you experience any problems, |iss|_ in the github repo.
 
 .. |iss| replace:: report an issue
 .. |msvcr| replace:: msvcr100.dll
+.. |bitser| replace:: BITS Return Values
 .. _iss: https://github.com/KeyWeeUsr/KivyInstaller/issues
 .. _msvcr: https://www.microsoft.com/en-us/download/details.aspx?id=5555
 .. _bitsadmin: https://www.microsoft.com/en-us/download/details.aspx?id=18546
+.. _bitser: https://msdn.microsoft.com/en-us/library/windows/desktop/aa362823

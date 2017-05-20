@@ -29,3 +29,10 @@ a [video](https://youtu.be/ch_ILDBEaok) and find more features!
 2. Run `kivy.bat`, select your Python and Kivy versions, wait.
 
 3. Enjoy!
+
+Problems
+--------
+
+If you encounter problems during installation or if it fails without any error
+raised, check this section in the documentation before submitting an issue -
+[Known Problems](http://kivyinstaller.readthedocs.io/en/master/troubleshooting.html#known-problems).
