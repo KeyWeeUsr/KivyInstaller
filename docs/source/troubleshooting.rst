@@ -7,7 +7,7 @@ while using the KivyInstaller.
 Known problems
 --------------
 
-- Can't download Python ``.msi`` - probably missing ``bitsadmin``_, run ``cmd``
+- Can't download Python ``.msi`` - probably missing bitsadmin_, run ``cmd``
   and ``bitsadmin``. If available and still not downloading, |iss|_.
 
 - Python installation doesn't work - |iss|_ with ``msi.log`` from your folder.
