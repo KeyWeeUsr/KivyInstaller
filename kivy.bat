@@ -552,7 +552,7 @@ set has_error=1
 if %has_error%==0 (
     if not defined DEBUG (
         echo %kilog% Running touchtracer demo...
-        start cmd /c "%~dp0python.exe %~dp0share\kivy-examples\demo\touchtracer\main.py"
+        "%~dp0python.exe" "%~dp0share\kivy-examples\demo\touchtracer\main.py"
     )
     (echo cp=%cp%) > "%~dp0config.kivyinstaller"
     (echo cpwhl=%cpwhl%) >> "%~dp0config.kivyinstaller"
