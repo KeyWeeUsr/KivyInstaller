@@ -7,9 +7,9 @@
 ::https://www.microsoft.com/en-us/download/details.aspx?id=18546
 @if not defined DEBUG (echo off)
 if not defined cp2 (set cp2=cp27)
-if not defined cp3 (set cp3=cp35)
+if not defined cp3 (set cp3=cp34)
 if not defined py2 (set py2=2.7.13)
-if not defined py3 (set py3=3.5.2)
+if not defined py3 (set py3=3.4.4)
 if not defined master (set master=1.10.1)
 set xp=0
 set cp=0
