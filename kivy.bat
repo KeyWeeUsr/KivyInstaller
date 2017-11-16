@@ -74,6 +74,9 @@ if %processor_architecture%==AMD64 (
 if [%arch32%]==[n] (
     set arch=win_amd64
 )
+
+:: %~dp0 needed to access the Python executable directly where
+:: kivy.bat is, otherwise it might fetch the global system one
 if exist "%~dp0python.exe" (
     echo %kilog% Python is already installed!
     echo %kilog% - To continue with kivy installation choose "y"
@@ -444,15 +447,15 @@ if %installkivy%==0 (
 )
 echo %kilog% Preparing Python for Kivy...
 "%~dp0python.exe" -m pip install --upgrade pip wheel setuptools
-set packurl=--extra-index-url https://kivy.org/downloads/packages/simple/
-set packages=docutils pygments pypiwin32 requests wget kivy.deps.sdl2 kivy.deps.glew ^
-pyinstaller
+set packages=docutils pygments pypiwin32 requests wget ^
+    kivy.deps.sdl2 kivy.deps.glew pyinstaller
+
 if %gstreamer%==1 (
-    "%~dp0python.exe" -m pip install %packages% kivy.deps.gstreamer %packurl%
+    "%~dp0python.exe" -m pip install %packages% kivy.deps.gstreamer
 ) else (
-    "%~dp0python.exe" -m pip install %packages% %packurl%
+    "%~dp0python.exe" -m pip install %packages%
 )
-"%~dp0python.exe" -m pip install -I https://kivy.org/downloads/appveyor/kivy/Kivy_examples-%master%.dev0-py2.py3-none-any.whl
+"%~dp0python.exe" -m pip install -U --no-cache-dir https://kivy.org/downloads/appveyor/kivy/Kivy_examples-%master%.dev0-py2.py3-none-any.whl
 if %stable%==1 (
     "%~dp0python.exe" -m pip uninstall -y kivy
     "%~dp0python.exe" -m pip install kivy
