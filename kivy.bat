@@ -1,5 +1,5 @@
 ::Author: KeyWeeUsr @ https://github.com/KeyWeeUsr
-::Version: 3.6
+::Version: 3.7
 ::Inspired by kivy.bat file for kivy1.8.0
 ::To reset file just delete "config.kivyinstaller"
 ::Bitsadmin is available since winXP SP2
@@ -28,7 +28,7 @@ set arch=win32
 set pyversion=0
 set gstreamer=0
 set installkivy=1
-set installerversion=3.6
+set installerversion=3.7
 set kilog=[KivyInstaller]
 
 :: - Environment paths and configs
@@ -39,6 +39,7 @@ set py35addlocal=Shortcuts=0 Include_launcher=0 Include_pip=0
 set pyFTP=https://www.python.org/ftp/python/
 
 :: Return version without installation
+:version
 if [%1]==[version] (
     echo %installerversion%
     exit
@@ -105,14 +106,14 @@ if [%kivycontinue%]==[n] (
 :privileges
 set /p choice_privileges="Install Python globally (requires admin)? y/n"
 if [%choice_privileges%]==[y] (
-    goto version
+    goto py_version
 ) else if [%choice_privileges%]==[n] (
     set admin=0
 ) else (
     goto privileges
 )
 
-:version
+:py_version
 set /p choice_python="Choose the Python version! 2/3"
 if [%choice_python%]==[2] (
     set pyversion=%py2%
@@ -126,7 +127,7 @@ if [%choice_python%]==[2] (
     set cpwhl=%cp3%
     set shrtct=%cp3:~2%
 ) else (
-    goto version
+    goto py_version
 )
 
 :extensions
@@ -460,7 +461,8 @@ if [%installkivy%]==[0] (
 echo %kilog% Preparing Python for Kivy...
 "%~dp0python.exe" -m pip install --upgrade pip wheel setuptools
 set packages=docutils pygments pypiwin32 requests wget ^
-    kivy.deps.sdl2 kivy.deps.glew pyinstaller
+    kivy.deps.sdl2 kivy.deps.glew kivy.deps.angle ^
+    pyinstaller
 
 if [%gstreamer%]==[1] (
     "%~dp0python.exe" -m pip install %packages% kivy.deps.gstreamer
@@ -643,6 +645,8 @@ if [%1]==[update] (
     goto end
 ) else if [%1]==[help] (
     goto help
+) else if [%1]==[version] (
+    goto version
 )
 set /p extrapath=<"%~dp0extrapath.kivyinstaller"
 if defined extrapath (
