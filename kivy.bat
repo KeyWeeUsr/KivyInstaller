@@ -262,7 +262,7 @@ if [%arch%]==[win32] (
     )
     if [%admin%]==[0] (
         copy "%~dp0py%pyversion%%amdext%.msi" "%~dp0py%pyversion%_%amdext%.msi" >nul
-        if [pyext%].msi (
+        if [%pyext%]==[.msi] (
             msiexec.exe /a "%~dp0py%pyversion%%amdext%.msi" /qb /L*V "%~dp0msi.log" ^
             ALLUSERS=0 TARGETDIR="%~dp0kivy" CURRENTDIRECTORY="%~dp0" %addlocal%
             for /f "tokens=*" %%f in ('dir /b "%~dp0kivy"') do move "%~dp0kivy\%%f" "%~dp0%%f" >nul
