@@ -220,7 +220,7 @@ build_script:
         set py3=%LATESTPY36%&& set cp3=cp36&&set ___=
     )
 
-    set choice_kivy=y && set choice_master=n
+    set choice_kivy=y&& set choice_master=n
 
     if "%MASTER%"=="1" (
         set choice_master=y
@@ -244,7 +244,7 @@ build_script:
         set choice_shrt=y
     )
 
-    set master=%KVMASTER%&& set choice_ext=n && set choice_gst=n
+    set master=%KVMASTER%&& set choice_ext=n&& set choice_gst=n
 
     REM ***********************************************************************
     REM ARCH option is the first asked option, therefore it needs a user      *
