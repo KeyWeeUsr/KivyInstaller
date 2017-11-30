@@ -434,8 +434,8 @@ for /f "delims=" %%l in ('type "%~dp0update_kivy.bat"') do (
     )
 )
 
-if defined DEBUG echo [%installerversion%] lss [%updateversion%]
-if [%installerversion%] lss [%updateversion%] (
+if defined DEBUG echo "%installerversion% lss %updateversion%"
+if %installerversion% lss %updateversion% (
     echo %kilog% You are using KivyInstaller version %installerversion%!
     echo %kilog% - New version %updateversion% is available!
     if defined DEBUG echo [%onlycheck%]==[1]
@@ -444,7 +444,7 @@ if [%installerversion%] lss [%updateversion%] (
         del "%~dp0update_kivy.bat"
         goto console
     )
-) else if [%installerversion%]==[%updateversion%] (
+) else if %installerversion% == %updateversion% (
     echo %kilog% Your version is up to date!
     del "%~dp0update_kivy.bat"
     goto console
