@@ -208,7 +208,7 @@ build_script:
     REM Set options from the env vars provided in matrix + default fallback.  *
     REM ***********************************************************************
 
-    set DEBUG=1 && set choice_python=3
+    set DEBUG=1&& set choice_python=3&&set ___=
 
     if "%PY%"=="27" (
         set choice_python=2&& set py2=%LATESTPY2%&& set cp2=cp27&&set ___=
@@ -220,31 +220,31 @@ build_script:
         set py3=%LATESTPY36%&& set cp3=cp36&&set ___=
     )
 
-    set choice_kivy=y&& set choice_master=n
+    set choice_kivy=y&& set choice_master=n&&set ___=
 
     if "%MASTER%"=="1" (
-        set choice_master=y
+        set choice_master=y&&set ___=
     )
 
-    set choice_privileges=n
+    set choice_privileges=n&&set ___=
 
     if "%ADMIN%"=="1" (
-        set choice_privileges=y
+        set choice_privileges=y&&set ___=
     )
 
-    set choice_dsgn=n
+    set choice_dsgn=n&&set ___=
 
     if "%DESIGNER%"=="1" (
-        set choice_dsgn=y
+        set choice_dsgn=y&&set ___=
     )
 
-    set choice_shrt=n
+    set choice_shrt=n&&set ___=
 
     if "%SHORTCUTS%"=="1" (
-        set choice_shrt=y
+        set choice_shrt=y&&set ___=
     )
 
-    set master=%KVMASTER%&& set choice_ext=n&& set choice_gst=n
+    set master=%KVMASTER%&& set choice_ext=n&& set choice_gst=n&&set ___=
 
     REM ***********************************************************************
     REM ARCH option is the first asked option, therefore it needs a user      *
