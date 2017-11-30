@@ -72,19 +72,6 @@ if exist "%~dp0config.kivyinstaller" (
     set first=1
 )
 
-:: Python 3.5+ has different type of installer
-set amdext=.amd64
-if defined DEBUG echo [%py3%] geq [3.5.0]
-if [%py3%] geq [3.5.0] (
-   set pyext=.exe
-) else (
-   set pyext=.msi
-)
-if defined DEBUG echo [%pyext%]==[.exe]
-if [%pyext%]==[.exe] (
-    set amdext=-amd64
-)
-
 if defined DEBUG echo not [%first%]==[1]
 if not [%first%]==[1] (
     goto installed
@@ -136,8 +123,21 @@ if [%choice_python%]==[2] (
     set cp=%cp3%m
     set cpwhl=%cp3%
     set shrtct=%cp3:~2%
+    if defined DEBUG echo [%py3%] geq [3.5.0]
+    if [%py3%] geq [3.5.0] (
+        set pyext=.exe
+    ) else (
+        set pyext=.msi
+    )
 ) else (
     goto py_version
+)
+
+:: Python 3.5+ has different type of installer
+set amdext=.amd64
+if defined DEBUG echo [%pyext%]==[.exe]
+if [%pyext%]==[.exe] (
+    set amdext=-amd64
 )
 
 :extensions
