@@ -15,8 +15,6 @@ if not defined py3 (set py3=3.5.2)
 if not defined master (set master=1.10.1)
 
 :: Config variables
-title = KivyInstaller %installerversion%
-
 :: - KivyInstaller variables
 set xp=0
 set cp=0
@@ -30,6 +28,7 @@ set gstreamer=0
 set installkivy=1
 set installerversion=3.7
 set kilog=[KivyInstaller]
+title = KivyInstaller %installerversion%
 
 :: - Environment paths and configs
 set sendto=%appdata%\Microsoft\Windows\SendTo
@@ -422,16 +421,9 @@ del "%~dp0_update_kivy.bat"
 
 :: Find the installer's version - fixed to the 2nd line
 :: -> strip "::Version: "(11)
-:: do NOT remove unless other way is found
-:: do NOT use endlocal, clears the values
-setlocal ENABLEDELAYEDEXPANSION
-set /a line=0
-for /f "delims=" %%l in ('type "%~dp0update_kivy.bat"') do (
-    set /a line=line+1
-    if !line! equ 2 (
-        set updateversion=%%l
-        set updateversion=!updateversion:~11!
-    )
+for /f "tokens=1*delims=::Version: " ^
+%%A in ('findstr /n "^" "%~dp0update_kivy.bat"') do (
+    if %%A equ 2 set updateversion=%%B
 )
 
 if defined DEBUG echo "%installerversion% lss %updateversion%"
