@@ -1,16 +1,21 @@
 ::Author: KeyWeeUsr @ https://github.com/KeyWeeUsr
-::Version: 3.6
+::Version: 3.7
 ::Inspired by kivy.bat file for kivy1.8.0
 ::To reset file just delete "config.kivyinstaller"
 ::Bitsadmin is available since winXP SP2
 ::If it is not available, download and install to C:\Windows
 ::https://www.microsoft.com/en-us/download/details.aspx?id=18546
+
+:: Customizable variables
 @if not defined DEBUG (echo off)
 if not defined cp2 (set cp2=cp27)
 if not defined cp3 (set cp3=cp35)
 if not defined py2 (set py2=2.7.13)
 if not defined py3 (set py3=3.5.2)
 if not defined master (set master=1.10.1)
+
+:: Config variables
+:: - KivyInstaller variables
 set xp=0
 set cp=0
 set first=1
@@ -21,10 +26,11 @@ set arch=win32
 set pyversion=0
 set gstreamer=0
 set installkivy=1
-set installerversion=3.6
+set installerversion=3.7
 set kilog=[KivyInstaller]
-setlocal ENABLEDELAYEDEXPANSION
 title = KivyInstaller %installerversion%
+
+:: - Environment paths and configs
 set sendto=%appdata%\Microsoft\Windows\SendTo
 set taskbar=%appdata%\Microsoft\Internet Explorer\Quick Launch
 set addlocal=ADDLOCAL^=DefaultFeature,PrivateCRT,TclTk,Documentation,Tools,Testsuite
@@ -32,20 +38,17 @@ set py35addlocal=Shortcuts=0 Include_launcher=0 Include_pip=0
 set pyFTP=https://www.python.org/ftp/python/
 
 :: Return version without installation
+:version
+if defined DEBUG echo [%1]==[version]
 if [%1]==[version] (
     echo %installerversion%
     exit
 )
 
-:: Set downloader
-if [%SHELL%]==[/bin/bash] (
-    set down=kiwget.exe
-) else (
-    set down=bitsadmin.exe
-)
-
+:: Check whether we are on WinXP
 ver | find "5.1" >nul && set xp=1
-if %xp%==1 (
+if defined DEBUG echo [%xp%]==[1]
+if [%xp%]==[1] (
     set sendto=%userprofile%\SendTo
 )
 
@@ -56,6 +59,8 @@ echo.
 echo Report issues @ https://github.com/KeyWeeUsr/KivyInstaller/issues
 echo ###############################################################################
 
+:: Look for KivyInstaller config
+:: - if found, Python+Kivy+... were installed properly and script expects it
 echo %kilog% Looking for config file...
 if exist "%~dp0config.kivyinstaller" (
     echo %kilog% Config file found, setting variables...
@@ -66,64 +71,81 @@ if exist "%~dp0config.kivyinstaller" (
     set first=1
 )
 
-if %py3% geq 3.5.0 (
-   set pyext=.exe
-) else (
-   set pyext=.msi
-)
-
-if not %first%==1 (
+if defined DEBUG echo not [%first%]==[1]
+if not [%first%]==[1] (
     goto installed
 )
-if %processor_architecture%==AMD64 (
+if defined DEBUG echo [%processor_architecture%]==[AMD64]
+if [%processor_architecture%]==[AMD64] (
     set /p arch32="64bit environment detected! Create 32bit instead? y/n"
 )
+if defined DEBUG echo [%arch32%]==[n]
 if [%arch32%]==[n] (
     set arch=win_amd64
 )
+
+:: %~dp0 needed to access the Python executable directly where
+:: kivy.bat is, otherwise it might fetch the global system one
 if exist "%~dp0python.exe" (
     echo %kilog% Python is already installed!
     echo %kilog% - To continue with kivy installation choose "y"
     echo %kilog% - To uninstall choose "n"
     set /p kivycontinue="Continue with kivy installation? y/n"
-    if !kivycontinue!==n (
-        goto uninstall
-    )
+)
+if defined DEBUG echo [%kivycontinue%]==[n]
+if [%kivycontinue%]==[n] (
+    goto uninstall
 )
 
 :privileges
 set /p choice_privileges="Install Python globally (requires admin)? y/n"
-if %choice_privileges%==y (
-    goto version
-) else if %choice_privileges%==n (
+if defined DEBUG echo [%choice_privileges%]==[y]
+if [%choice_privileges%]==[y] (
+    goto py_version
+) else if [%choice_privileges%]==[n] (
     set admin=0
 ) else (
     goto privileges
 )
 
-:version
+:py_version
 set /p choice_python="Choose the Python version! 2/3"
-if %choice_python%==2 (
+if defined DEBUG echo [%choice_python%]==[2]
+if [%choice_python%]==[2] (
     set pyversion=%py2%
     set cp=%cp2%m
     set cpwhl=%cp2%
     set shrtct=%cp2:~2%
     set pyext=.msi
-) else if %choice_python%==3 (
+) else if [%choice_python%]==[3] (
     set pyversion=%py3%
     set cp=%cp3%m
     set cpwhl=%cp3%
     set shrtct=%cp3:~2%
+    if defined DEBUG echo [%py3%] geq [3.5.0]
+    if [%py3%] geq [3.5.0] (
+        set pyext=.exe
+    ) else (
+        set pyext=.msi
+    )
 ) else (
-    goto version
+    goto py_version
+)
+
+:: Python 3.5+ has different type of installer
+set amdext=.amd64
+if defined DEBUG echo [%pyext%]==[.exe]
+if [%pyext%]==[.exe] (
+    set amdext=-amd64
 )
 
 :extensions
 set /p choice_ext="Register Python extensions (.py, .pyc, ...)? y/n"
-if %choice_ext%==y (
+if defined DEBUG echo [%choice_ext%]==[y]
+if [%choice_ext%]==[y] (
     set addlocal=%addlocal%,Extensions
     set py35addlocal=%py35addlocal% AssociateFiles=1
-) else if %choice_ext%==n (
+) else if [%choice_ext%]==[n] (
     set addlocal=%addlocal%
     set py35addlocal=%py35addlocal% AssociateFiles=0
 ) else (
@@ -132,66 +154,82 @@ if %choice_ext%==y (
 
 :kivy
 set /p choice_kivy="Proceed with Kivy installation? y/n"
-if %choice_kivy%==y (
+if defined DEBUG echo [%choice_kivy%]==[y]
+if [%choice_kivy%]==[y] (
     set installkivy=1
-) else if %choice_kivy%==n (
+) else if [%choice_kivy%]==[n] (
     set installkivy=0
     goto nokivy
 ) else (
     goto kivy
 )
 set /p choice_master="Install the latest development version? y/n"
-if %choice_master%==y (
+if defined DEBUG echo [%choice_master%]==[y]
+if [%choice_master%]==[y] (
     set stable=0
 )
 set /p choice_gst="Install GStreamer? y/n"
-if %choice_gst%==y (
+if defined DEBUG echo [%choice_gst%]==[y]
+if [%choice_gst%]==[y] (
     set gstreamer=1
 )
 set /p choice_dsgn="Install Kivy Designer? y/n"
-if %choice_dsgn%==y (
+if defined DEBUG echo [%choice_dsgn%]==[y]
+if [%choice_dsgn%]==[y] (
     set designer=1
 )
 
 set /p choice_shrt="Make shortcuts (taskbar + send to)? y/n"
-if %choice_shrt%==y (
+if defined DEBUG echo [%choice_shrt%]==[y]
+if [%choice_shrt%]==[y] (
     set shortcuts=1
 )
 
+:: No Kivy installation expected
 :nokivy
-if !kivycontinue!==y (
+if defined DEBUG echo [%kivycontinue%]==[y]
+if [%kivycontinue%]==[y] (
     goto check
 )
 :: needs fixing for webinstallers
-if %arch%==win32 (
-    if exist "%~dp0py%pyversion%!pyext!" (
+if defined DEBUG echo [%arch%]==[win32]
+if [%arch%]==[win32] (
+    if exist "%~dp0py%pyversion%%pyext%" (
         echo %kilog% Installer is already downloaded!
     ) else (
         echo %kilog% Downloading Python installer...
-        if !pyext!==.exe (
-            if %admin%==0 (
-                %down% /transfer "GetPython%pyversion%-webinstall!pyext!" ^
-                "%pyFTP%%pyversion%/python-%pyversion%-webinstall!pyext!" ^
-                "%~dp0py%pyversion%-webinstall!pyext!"
+        if defined DEBUG echo [%pyext%]==[.exe]
+        if [%pyext%]==[.exe] (
+            if defined DEBUG echo [%admin%]==[0]
+            if [%admin%]==[0] (
+                bitsadmin.exe /transfer ^
+                "GetPython%pyversion%-webinstall%pyext%" ^
+                "%pyFTP%%pyversion%/python-%pyversion%-webinstall%pyext%" ^
+                "%~dp0py%pyversion%-webinstall%pyext%"
             ) else (
-                %down% /transfer "GetPython%pyversion%!pyext!" ^
-                "%pyFTP%%pyversion%/python-%pyversion%!pyext!" ^
-                "%~dp0py%pyversion%!pyext!"
+                bitsadmin.exe /transfer ^
+                "GetPython%pyversion%%pyext%" ^
+                "%pyFTP%%pyversion%/python-%pyversion%%pyext%" ^
+                "%~dp0py%pyversion%%pyext%"
             )
         ) else (
-            %down% /transfer "GetPython%pyversion%!pyext!" ^
-            "%pyFTP%%pyversion%/python-%pyversion%!pyext!" ^
-            "%~dp0py%pyversion%!pyext!"
+            bitsadmin.exe /transfer ^
+            "GetPython%pyversion%%pyext%" ^
+            "%pyFTP%%pyversion%/python-%pyversion%%pyext%" ^
+            "%~dp0py%pyversion%%pyext%"
         )
         echo %kilog% Installing...
     )
-    if %admin%==0 (
-        copy "%~dp0py%pyversion%!pyext!" "%~dp0py%pyversion%_!pyext!" >nul
-        if !pyext!==.msi (
+    if defined DEBUG echo [%admin%]==[0]
+    if [%admin%]==[0] (
+        copy "%~dp0py%pyversion%%pyext%" "%~dp0py%pyversion%_%pyext%" >nul
+        if defined DEBUG echo [%pyext%]==[.msi]
+        if [%pyext%]==[.msi] (
             msiexec.exe /a "%~dp0py%pyversion%.msi" /qb /L*V "%~dp0msi.log" ^
-            ALLUSERS=0 TARGETDIR="%~dp0kivy" CURRENTDIRECTORY="%~dp0" %addlocal%
+                ALLUSERS=0 TARGETDIR="%~dp0kivy" ^
+                CURRENTDIRECTORY="%~dp0" %addlocal%
             for /f "tokens=*" %%f in ('dir /b "%~dp0kivy"') do move "%~dp0kivy\%%f" "%~dp0%%f" >nul
-        ) else if !pyext!==.exe (
+        ) else if [%pyext%]==[.exe] (
             "%~dp0py%pyversion%-webinstall.exe" /quiet /layout "%~dp0\_installers"
             msiexec.exe /a "%~dp0\_installers\core.msi" TARGETDIR="%~dp0"
             msiexec.exe /a "%~dp0\_installers\dev.msi" TARGETDIR="%~dp0"
@@ -212,49 +250,50 @@ if %arch%==win32 (
             rmdir /s /q "%~dp0_installers"
         )
     ) else (
-        if !pyext!==.msi (
+        if defined DEBUG echo [%pyext%]==[.msi]
+        if [%pyext%]==[.msi] (
             msiexec.exe /i "%~dp0py%pyversion%.msi" /qb /L*V "%~dp0msi.log" ^
             ALLUSERS=0 TARGETDIR="%~dp0" CURRENTDIRECTORY="%~dp0" %addlocal%
-        ) else if !pyext!==.exe (
+        ) else if [%pyext%]==[.exe] (
             "%~dp0py%pyversion%.exe" /quiet /log "%~dp0msi.log" ^
             DefaultJustForMeTargetDir="%~dp0" InstallAllUsers=0 %py35addlocal%
         )
     )
 ) else (
-    set amdext=.amd64
-    if !pyext!==.exe (
-        set amdext=-amd64
-    )
-    if exist "%~dp0py%pyversion%!amdext!!pyext!" (
+    if exist "%~dp0py%pyversion%%amdext%%pyext%" (
         echo %kilog% Installer is already downloaded!
     ) else (
-        if !pyext!==.exe (
-            if %admin%==0 (
-                %down% /transfer ^
-                "GetPython%pyversion%!amdext!-webinstall!pyext!" ^
-                "%pyFTP%%pyversion%/python-%pyversion%!amdext!-webinstall!pyext!" ^
-                "%~dp0py%pyversion%!amdext!-webinstall!pyext!"
+        if defined DEBUG echo [%pyext%]==[.exe]
+        if [%pyext%]==[.exe] (
+            if defined DEBUG echo [%admin%]==[0]
+            if [%admin%]==[0] (
+                bitsadmin.exe /transfer ^
+                "GetPython%pyversion%%amdext%-webinstall%pyext%" ^
+                "%pyFTP%%pyversion%/python-%pyversion%%amdext%-webinstall%pyext%" ^
+                "%~dp0py%pyversion%%amdext%-webinstall%pyext%"
             ) else (
-                %down% /transfer ^
-                "GetPython%pyversion%!amdext!!pyext!" ^
-                "%pyFTP%%pyversion%/python-%pyversion%!amdext!!pyext!" ^
-                "%~dp0py%pyversion%!amdext!!pyext!"
+                bitsadmin.exe /transfer ^
+                "GetPython%pyversion%%amdext%%pyext%" ^
+                "%pyFTP%%pyversion%/python-%pyversion%%amdext%%pyext%" ^
+                "%~dp0py%pyversion%%amdext%%pyext%"
             )
         ) else (
-            %down% /transfer "GetPython%pyversion%!amdext!!pyext!" ^
-            "%pyFTP%%pyversion%/python-%pyversion%!amdext!!pyext!" ^
-            "%~dp0py%pyversion%!amdext!!pyext!"
+            bitsadmin.exe /transfer "GetPython%pyversion%%amdext%%pyext%" ^
+            "%pyFTP%%pyversion%/python-%pyversion%%amdext%%pyext%" ^
+            "%~dp0py%pyversion%%amdext%%pyext%"
         )
         echo %kilog% Installing...
     )
-    if %admin%==0 (
-        copy "%~dp0py%pyversion%!amdext!.msi" "%~dp0py%pyversion%_!amdext!.msi" >nul
-        if !pyext!==.msi (
-            msiexec.exe /a "%~dp0py%pyversion%!amdext!.msi" /qb /L*V "%~dp0msi.log" ^
+    if defined DEBUG echo [%admin%]==[0]
+    if [%admin%]==[0] (
+        copy "%~dp0py%pyversion%%amdext%.msi" "%~dp0py%pyversion%_%amdext%.msi" >nul
+        if defined DEBUG echo [%pyext%]==[.msi]
+        if [%pyext%]==[.msi] (
+            msiexec.exe /a "%~dp0py%pyversion%%amdext%.msi" /qb /L*V "%~dp0msi.log" ^
             ALLUSERS=0 TARGETDIR="%~dp0kivy" CURRENTDIRECTORY="%~dp0" %addlocal%
             for /f "tokens=*" %%f in ('dir /b "%~dp0kivy"') do move "%~dp0kivy\%%f" "%~dp0%%f" >nul
-        ) else if !pyext!==.exe (
-            "%~dp0py%pyversion%!amdext!-webinstall.exe" /quiet /layout "%~dp0\_installers"
+        ) else if [%pyext%]==[.exe] (
+            "%~dp0py%pyversion%%amdext%-webinstall.exe" /quiet /layout "%~dp0\_installers"
             msiexec.exe /a "%~dp0\_installers\core.msi" TARGETDIR="%~dp0"
             msiexec.exe /a "%~dp0\_installers\dev.msi" TARGETDIR="%~dp0"
             msiexec.exe /a "%~dp0\_installers\doc.msi" TARGETDIR="%~dp0"
@@ -274,20 +313,22 @@ if %arch%==win32 (
             rmdir /s /q "%~dp0_installers"
         )
     ) else (
-        if !pyext!==.msi (
-            msiexec.exe /i "%~dp0py%pyversion%!amdext!.msi" /qb /L*V "%~dp0msi.log" ^
+        if defined DEBUG echo [%pyext%]==[.msi]
+        if [%pyext%]==[.msi] (
+            msiexec.exe /i "%~dp0py%pyversion%%amdext%.msi" /qb /L*V "%~dp0msi.log" ^
             ALLUSERS=0 TARGETDIR="%~dp0" CURRENTDIRECTORY="%~dp0" %addlocal%
-        ) else if !pyext!==.exe (
-            "%~dp0py%pyversion%!amdext!.exe" /quiet /log "%~dp0msi.log" ^
+        ) else if [%pyext%]==[.exe] (
+            "%~dp0py%pyversion%%amdext%.exe" /quiet /log "%~dp0msi.log" ^
             DefaultJustForMeTargetDir="%~dp0" InstallAllUsers=0 %py35addlocal%
         )
     )
 )
-if %admin%==0 (
-    del /q "%~dp0py%pyversion%!pyext!"
-    move /y "%~dp0py%pyversion%_!pyext!" "%~dp0py%pyversion%!pyext!" >nul
-    del /q "%~dp0py%pyversion%!amdext!!pyext!"
-    move /y "%~dp0py%pyversion%_!amdext!!pyext!" "%~dp0py%pyversion%!amdext!!pyext!" >nul
+if defined DEBUG echo [%admin%]==[0]
+if [%admin%]==[0] (
+    del /q "%~dp0py%pyversion%%pyext%"
+    move /y "%~dp0py%pyversion%_%pyext%" "%~dp0py%pyversion%%pyext%" >nul
+    del /q "%~dp0py%pyversion%%amdext%%pyext%"
+    move /y "%~dp0py%pyversion%_%amdext%%pyext%" "%~dp0py%pyversion%%amdext%%pyext%" >nul
 )
 goto check
 
@@ -295,44 +336,47 @@ goto check
 set /p choice_uninstall="Uninstall the whole environment? y/n"
 set /p choice_pipcache="Remove cached pip files? y/n"
 set /p choice_dist="Remove PyInstaller dist folder (if any)? y/n"
-if %arch%==win32 (
-    if not exist "%~dp0py%pyversion%!pyext!" (
-        %down% /transfer "GetPython%pyversion%!pyext!" ^
-        "%pyFTP%%pyversion%/python-%pyversion%!pyext!" ^
-        "%~dp0py%pyversion%!pyext!"
+if defined DEBUG echo [%arch%]==[win32]
+if [%arch%]==[win32] (
+    if not exist "%~dp0py%pyversion%%pyext%" (
+        bitsadmin.exe /transfer "GetPython%pyversion%%pyext%" ^
+        "%pyFTP%%pyversion%/python-%pyversion%%pyext%" ^
+        "%~dp0py%pyversion%%pyext%"
     )
-    if %choice_uninstall%==y (
-        if %admin%==0 (
+    if defined DEBUG echo [%choice_uninstall%]==[y]
+    if [%choice_uninstall%]==[y] (
+        if defined DEBUG echo [%admin%]==[0]
+        if [%admin%]==[0] (
             attrib +r +a *.bat
             for /f "delims=" %%i in ('dir /b') do (rmdir "%%i" /s/q || del "%%i" /s/q)
             attrib -r -a *.bat
         ) else (
-            if !pyext!==.msi (
+            if defined DEBUG echo [%pyext%]==[.msi]
+            if [%pyext%]==[.msi] (
                 msiexec.exe /x "%~dp0py%pyversion%.msi" /qb
-            ) else if !pyext!==.exe (
+            ) else if [%pyext%]==[.exe] (
                 "%~dp0py%pyversion%.exe" /uninstall
             )
         )
     ) else (goto end)
 ) else (
-    set amdext=.amd64
-    if !pyext!==.exe (
-        set amdext=-amd64
+    if not exist "%~dp0py%pyversion%%amdext%%pyext%" (
+        bitsadmin.exe /transfer "GetPython%pyversion%%amdext%%pyext%" ^
+        "%pyFTP%%pyversion%/python-%pyversion%%amdext%%pyext%" ^
+        "%~dp0py%pyversion%%amdext%%pyext%"
     )
-    if not exist "%~dp0py%pyversion%%amdext%!pyext!" (
-        %down% /transfer "GetPython%pyversion%%amdext%!pyext!" ^
-        "%pyFTP%%pyversion%/python-%pyversion%%amdext%!pyext!" ^
-        "%~dp0py%pyversion%%amdext%!pyext!"
-    )
-    if %choice_uninstall%==y (
-        if %admin%==0 (
+    if defined DEBUG echo [%choice_uninstall%]==[y]
+    if [%choice_uninstall%]==[y] (
+        if defined DEBUG echo [%admin%]==[0]
+        if [%admin%]==[0] (
             attrib +r +a *.bat
             for /f "delims=" %%i in ('dir /b') do (rmdir "%%i" /s/q || del "%%i" /s/q)
             attrib -r -a *.bat
         ) else (
-            if !pyext!==.msi (
+            if defined DEBUG echo [%pyext%]==[.msi]
+            if [%pyext%]==[.msi] (
                 msiexec.exe /x "%~dp0py%pyversion%%amdext%.msi" /qb
-            ) else if !pyext!==.exe (
+            ) else if [%pyext%]==[.exe] (
                 "%~dp0py%pyversion%%amdext%.msi" /uninstall
             )
         )
@@ -352,14 +396,16 @@ if not exist "%~dp0python.exe" (
     rmdir /s /q "%~dp0whls"
     rmdir /s /q "%~dp0build"
 )
-if %choice_pipcache%==y (
+if defined DEBUG echo [%choice_pipcache%]==[y]
+if [%choice_pipcache%]==[y] (
     if exist "%localappdata%\pip" (
         rmdir /s /q "%localappdata%\pip"
     ) else (
         rmdir /s /q "%userprofile%\Local Settings\Application Data\pip"
     )
 )
-if %choice_dist%==y (
+if defined DEBUG echo [%choice_dist%]==[y]
+if [%choice_dist%]==[y] (
     rmdir /s /q "%~dp0dist"
 )
 goto rmshortcuts
@@ -367,7 +413,7 @@ goto rmshortcuts
 :batupdate
 :: Download GitHub's raw output
 echo %kilog% Checking for updates...
-%down% /transfer "GetKivyInstaller" "https://git.io/vDDjn" "%~dp0_update_kivy.bat"
+bitsadmin.exe /transfer "GetKivyInstaller" "https://git.io/vDDjn" "%~dp0_update_kivy.bat"
 
 :: UNIX to WIN EOL (GitHub raw provides \n) with MORE /P
 type "%~dp0_update_kivy.bat" | more /p > "%~dp0update_kivy.bat"
@@ -375,24 +421,22 @@ del "%~dp0_update_kivy.bat"
 
 :: Find the installer's version - fixed to the 2nd line
 :: -> strip "::Version: "(11)
-set /a line=0
-for /f "delims=" %%l in ('type "%~dp0update_kivy.bat"') do (
-    set /a line=line+1
-    if !line! equ 2 (
-        set updateversion=%%l
-        set updateversion=!updateversion:~11!
-    )
+for /f "tokens=1*delims=::Version: " ^
+%%A in ('findstr /n "^" "%~dp0update_kivy.bat"') do (
+    if %%A equ 2 set updateversion=%%B
 )
 
+if defined DEBUG echo "%installerversion% lss %updateversion%"
 if %installerversion% lss %updateversion% (
     echo %kilog% You are using KivyInstaller version %installerversion%!
     echo %kilog% - New version %updateversion% is available!
-    if %onlycheck%==1 (
+    if defined DEBUG echo [%onlycheck%]==[1]
+    if [%onlycheck%]==[1] (
         echo %kilog% - To install new version use - %~n0 batupdate
         del "%~dp0update_kivy.bat"
         goto console
     )
-) else if %installerversion%==%updateversion% (
+) else if %installerversion% == %updateversion% (
     echo %kilog% Your version is up to date!
     del "%~dp0update_kivy.bat"
     goto console
@@ -446,24 +490,29 @@ if exist "%~dp0python.exe" (
     echo %kilog% Installing pip...
     "%~dp0python.exe" -m ensurepip
 )
-if %installkivy%==0 (
+if defined DEBUG echo [%installkivy%]==[0]
+if [%installkivy%]==[0] (
     goto end
 )
 echo %kilog% Preparing Python for Kivy...
 "%~dp0python.exe" -m pip install --upgrade pip wheel setuptools
-set packurl=--extra-index-url https://kivy.org/downloads/packages/simple/
-set packages=docutils pygments pypiwin32 requests wget kivy.deps.sdl2 kivy.deps.glew ^
-pyinstaller
-if %gstreamer%==1 (
-    "%~dp0python.exe" -m pip install %packages% kivy.deps.gstreamer %packurl%
+set packages=docutils pygments pypiwin32 requests wget ^
+    kivy.deps.sdl2 kivy.deps.glew kivy.deps.angle ^
+    pyinstaller
+
+if defined DEBUG echo [%gstreamer%]==[1]
+if [%gstreamer%]==[1] (
+    "%~dp0python.exe" -m pip install %packages% kivy.deps.gstreamer
 ) else (
-    "%~dp0python.exe" -m pip install %packages% %packurl%
+    "%~dp0python.exe" -m pip install %packages%
 )
-"%~dp0python.exe" -m pip install -I https://kivy.org/downloads/appveyor/kivy/Kivy_examples-%master%.dev0-py2.py3-none-any.whl
-if %stable%==1 (
+"%~dp0python.exe" -m pip install -U --no-cache-dir https://kivy.org/downloads/appveyor/kivy/Kivy_examples-%master%.dev0-py2.py3-none-any.whl
+if defined DEBUG echo [%stable%]==[1]
+if [%stable%]==[1] (
     "%~dp0python.exe" -m pip uninstall -y kivy
     "%~dp0python.exe" -m pip install kivy
-    if !designer!==1 (
+    if defined DEBUG echo [%designer%]==[1]
+    if [%designer%]==[1] (
         "%~dp0python.exe" -m pip install https://github.com/kivy/kivy-designer/zipball/master
     )
     goto kivyend
@@ -524,7 +573,8 @@ echo.)>> "%~dp0getnightly.py"
 "%~dp0python.exe" "%~dp0getnightly.py"
 if not defined DEBUG (del "%~dp0getnightly.py")
 
-if %first%==0 (
+if defined DEBUG echo [%first%]==[0]
+if [%first%]==[0] (
     if exist "%~dp0whls\Kivy-%master%.dev0-%cpwhl%-none-%arch%.whl" (
         "%~dp0python.exe" -m pip uninstall -y kivy
         "%~dp0python.exe" -m pip install "%~dp0whls\Kivy-%master%.dev0-%cpwhl%-none-%arch%.whl"
@@ -534,7 +584,8 @@ if %first%==0 (
 ) else (
     "%~dp0python.exe" -m pip install "%~dp0whls\Kivy-%master%.dev0-%cpwhl%-none-%arch%.whl"
 )
-if !designer!==1 (
+if defined DEBUG echo [%designer%]==[1]
+if [%designer%]==[1] (
     "%~dp0python.exe" -m pip install https://github.com/kivy/kivy-designer/zipball/master
 )
 del /q "%~dp0whls\Kivy-%master%.dev0-%cpwhl%-none-%arch%.whl"
@@ -549,7 +600,8 @@ set PATH=%~dp0;%~dp0Tools;%~dp0Scripts;%~dp0share\sdl2\bin;%~dp0Lib\idlelib;%PAT
 set has_error=1
 "%~dp0python.exe" -c "import kivy" && set has_error=0
 
-if %has_error%==0 (
+if defined DEBUG echo [%has_error%]==[0]
+if [%has_error%]==[0] (
     if not defined DEBUG (
         echo %kilog% Running touchtracer demo...
         "%~dp0python.exe" "%~dp0share\kivy-examples\demo\touchtracer\main.py"
@@ -580,7 +632,8 @@ if %has_error%==0 (
 
 :mkshortcuts
 :: Create a launcher that triggers kivy.bat remotely [BAT]
-if !shortcuts!==1 (
+if defined DEBUG echo [%shortcuts%]==[1]
+if [%shortcuts%]==[1] (
     (echo @echo off) > "%taskbar%\Kivy%shrtct%.bat"
     (echo if "%%~1"=="" ^() >> "%taskbar%\Kivy%shrtct%.bat"
     (echo     cd "%~dp0") >> "%taskbar%\Kivy%shrtct%.bat"
@@ -598,6 +651,7 @@ del /q "%taskbar%\Kivy%shrtct%.bat"
 goto end
 
 :installed
+if defined DEBUG echo [%1]==[update]
 if [%1]==[update] (
     set stable=1
     goto check
@@ -629,21 +683,24 @@ if [%1]==[update] (
     start "" "https://kivy.org/docs/installation/installation-windows.html#use-development-kivy"
     goto end
 ) else if [%1]==[getmsvc] (
-    %down% /transfer "GetVC++" "http://go.microsoft.com/fwlink/?LinkId=691126" "%~dp0visualcppbuildtools_full.exe"
+    bitsadmin.exe /transfer "GetVC++" "http://go.microsoft.com/fwlink/?LinkId=691126" "%~dp0visualcppbuildtools_full.exe"
     start %cd%\visualcppbuildtools_full.exe
     start "" "https://git.io/vyyhO"
     goto end
 ) else if [%1]==[help] (
     goto help
+) else if [%1]==[version] (
+    goto version
 )
 set /p extrapath=<"%~dp0extrapath.kivyinstaller"
 if defined extrapath (
-    set PATH=%extrapath%;%~dp0;%~dp0Tools;%~dp0Scripts;%~dp0share\sdl2\bin;%~dp0Lib\idlelib;!PATH!
+    set PATH=%extrapath%;%~dp0;%~dp0Tools;%~dp0Scripts;%~dp0share\sdl2\bin;%~dp0Lib\idlelib;%PATH%
 ) else (
-    set PATH=%~dp0;%~dp0Tools;%~dp0Scripts;%~dp0share\sdl2\bin;%~dp0Lib\idlelib;!PATH!
+    set PATH=%~dp0;%~dp0Tools;%~dp0Scripts;%~dp0share\sdl2\bin;%~dp0Lib\idlelib;%PATH%
 )
 echo PATH:
 echo %PATH%
+if defined DEBUG echo [%1]==[]
 if [%1]==[] goto console
 echo.
 echo %kilog% Running "python.exe %*"
@@ -682,6 +739,7 @@ exit
 
 :pack
 :: Package simple Kivy apps (Standard library + Kivy+GLEW+ANGLE+SDL2+GST) [PY]
+if defined DEBUG echo not [%1]==[pack] (
 if not [%1]==[pack] (
     pause
     exit
