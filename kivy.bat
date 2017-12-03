@@ -502,7 +502,8 @@ set packages=docutils pygments pypiwin32 requests wget ^
 
 if defined DEBUG echo [%gstreamer%]==[1]
 if [%gstreamer%]==[1] (
-    "%~dp0python.exe" -m pip install %packages% kivy.deps.gstreamer
+    "%~dp0python.exe" -m pip install %packages%
+    "%~dp0python.exe" -m pip install --no-cache-dir kivy.deps.gstreamer
 ) else (
     "%~dp0python.exe" -m pip install %packages%
 )
