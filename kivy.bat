@@ -695,10 +695,11 @@ if [%1]==[update] (
 )
 set /p extrapath=<"%~dp0extrapath.kivyinstaller"
 if defined extrapath (
-    set PATH=%extrapath%;%~dp0;%~dp0Tools;%~dp0Scripts;%~dp0share\sdl2\bin;%~dp0Lib\idlelib;%PATH%
+    set new_PATH=%extrapath%;%~dp0;%~dp0Tools;%~dp0Scripts;%~dp0share\sdl2\bin;%~dp0Lib\idlelib
 ) else (
-    set PATH=%~dp0;%~dp0Tools;%~dp0Scripts;%~dp0share\sdl2\bin;%~dp0Lib\idlelib;%PATH%
+    set new_PATH=%~dp0;%~dp0Tools;%~dp0Scripts;%~dp0share\sdl2\bin;%~dp0Lib\idlelib
 )
+set PATH=%new_PATH%;%PATH%
 echo PATH:
 echo %PATH%
 if defined DEBUG echo [%1]==[]
