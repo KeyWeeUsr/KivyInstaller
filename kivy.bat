@@ -467,7 +467,7 @@ echo   uninstall                Uninstall kivy, python and leave only %~n0.bat
 echo   mkshortcuts              Create shortcuts for SendTo and TaskBar
 echo   rmshortcuts              Remove shortcuts for SendTo and TaskBar
 echo   pack "<abs path to .py>" Quick packaging with pyinstaller
-echo   version                  Prints version of the KivyInstaller
+echo   version                  Print version of the KivyInstaller
 echo   help                     Show this
 echo.
 echo Optional:
@@ -477,7 +477,9 @@ echo.
 echo Extra install:
 echo   getdesigner              Install Kivy Designer (python -m designer)
 echo   getgcc                   Install GNU Compiler Collection (mingw32-make, gcc)
-echo   getmsvc                  Open an URL for Visual C++ Build Tools
+echo   getmsvc9                 Download Visual C++  9.0 standalone compiler
+echo   getmsvc10                Download Visual C++ 10.0 standalone SDK
+echo   getmsvc14                Download Visual C++ 14.0 Build Tools 2015
 echo.
 echo ExtraPATH:
 echo   Write new PATH as it is. Separate with ; . No quotes, no ; at the end.
@@ -683,7 +685,15 @@ if [%1]==[update] (
     "%~dp0python.exe" -m pip install -I -U -i https://pypi.anaconda.org/carlkl/simple mingwpy
     start "" "https://kivy.org/docs/installation/installation-windows.html#use-development-kivy"
     goto end
-) else if [%1]==[getmsvc] (
+) else if [%1]==[getmsvc9] (
+    bitsadmin.exe /transfer "GetVC++" "https://download.microsoft.com/download/7/9/6/796EF2E4-801B-4FC4-AB28-B59FBF6D907B/VCForPython27.msi" "%~dp0VCForPython27.msi"
+    start %cd%\VCForPython27.msi
+    goto end
+) else if [%1]==[getmsvc10] (
+    bitsadmin.exe /transfer "GetVC++" "http://download.microsoft.com/download/F/1/0/F10113F5-B750-4969-A255-274341AC6BCE/GRMSDK_EN_DVD.iso" "%~dp0GRMSDK_EN_DVD.iso"
+    start %cd%\GRMSDK_EN_DVD.iso
+    goto end
+) else if [%1]==[getmsvc14] (
     bitsadmin.exe /transfer "GetVC++" "http://go.microsoft.com/fwlink/?LinkId=691126" "%~dp0visualcppbuildtools_full.exe"
     start %cd%\visualcppbuildtools_full.exe
     start "" "https://git.io/vyyhO"
