@@ -24,11 +24,13 @@ Extra packages
 There are optional packages you may want to install later (see ``kivy help``
 command), however compilers need some post-install editing, otherwise they
 won't work with Kivy. A command for installing compiler also opens
-a documentation page related to the chosen compiler.:
+a documentation page related to the chosen compiler if available:
 
 - Kivy Designer
 - MinGWPy (GCC)
-- Visual C++ Build Tools (MSVC)
+- Visual C++ 9.0 standalone compiler (MSVC)
+- Visual C++ 10.0 standalone SDK (MSVC)
+- Visual C++ 14.0 Build Tools 2015 (MSVC)
 
 Extra PATH
 ----------

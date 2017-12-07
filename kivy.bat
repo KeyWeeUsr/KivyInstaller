@@ -1,5 +1,5 @@
 ::Author: KeyWeeUsr @ https://github.com/KeyWeeUsr
-::Version: 3.7
+::Version: 3.8
 ::Inspired by kivy.bat file for kivy1.8.0
 ::To reset file just delete "config.kivyinstaller"
 ::Bitsadmin is available since winXP SP2
@@ -26,7 +26,7 @@ set arch=win32
 set pyversion=0
 set gstreamer=0
 set installkivy=1
-set installerversion=3.7
+set installerversion=3.8
 set kilog=[KivyInstaller]
 title = KivyInstaller %installerversion%
 
