@@ -3,7 +3,7 @@ environment:
   AVRAW: https://raw.githubusercontent.com/appveyor/ci/master/scripts/
   AVFILE: enable-desktop.ps1
   pyFTP: https://www.python.org/ftp/python/
-  KVMASTER: 1.10.1
+  KVMASTER: 1.11.0
   LATESTPY2: 2.7.13
   LATESTPY34: 3.4.4
   LATESTPY35: 3.5.3
