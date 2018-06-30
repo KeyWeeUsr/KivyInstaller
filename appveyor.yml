@@ -7,7 +7,7 @@ environment:
   LATESTPY2: 2.7.13
   LATESTPY34: 3.4.4
   LATESTPY35: 3.5.3
-  LATESTPY36: 3.6.3
+  LATESTPY36: 3.6.5
 
   matrix:
   - PY: 27
