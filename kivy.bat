@@ -1,5 +1,5 @@
 ::Author: KeyWeeUsr @ https://github.com/KeyWeeUsr
-::Version: 3.8
+::Version: 3.9
 ::Inspired by kivy.bat file for kivy1.8.0
 ::To reset file just delete "config.kivyinstaller"
 ::Bitsadmin is available since winXP SP2
@@ -12,7 +12,7 @@ if not defined cp2 (set cp2=cp27)
 if not defined cp3 (set cp3=cp35)
 if not defined py2 (set py2=2.7.13)
 if not defined py3 (set py3=3.5.2)
-if not defined master (set master=1.10.1)
+if not defined master (set master=1.11.0)
 
 :: Config variables
 :: - KivyInstaller variables
@@ -26,7 +26,7 @@ set arch=win32
 set pyversion=0
 set gstreamer=0
 set installkivy=1
-set installerversion=3.8
+set installerversion=3.9
 set kilog=[KivyInstaller]
 title = KivyInstaller %installerversion%
 
